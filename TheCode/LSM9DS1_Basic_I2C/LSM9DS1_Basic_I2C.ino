@@ -148,7 +148,7 @@ void loop()
 	//delay(PRINT_SPEED);
 }
 
-void imuDisplayData(LSM9DS1 &imu)
+void imuDisplayData(LSM9DS1 *imu)
 {
 
   	printGyro(imu);  // Print "G: gx, gy, gz"
@@ -164,8 +164,9 @@ void imuDisplayData(LSM9DS1 &imu)
 
 }
 
-void imuMuxInit(LSM9DS1 &imu)
+void imuMuxInit(LSM9DS1 *imu)
 {
+	imu = (LSM9DS1*) malloc(sizeof(LSM9DS1));
   // Before initializing the IMU, there are a few settings
   // we may need to adjust. Use the settings struct to set
   // the device's communication mode and addresses:
@@ -191,7 +192,7 @@ void imuMuxInit(LSM9DS1 &imu)
 	}
 }
 
-void printGyro(LSM9DS1 &imu)
+void printGyro(LSM9DS1 *imu)
 {
   // To read from the gyroscope, you must first call the
   // readGyro() function. When this exits, it'll update the
@@ -220,7 +221,7 @@ void printGyro(LSM9DS1 &imu)
 #endif
 }
 
-void printAccel(LSM9DS1 &imu)
+void printAccel(LSM9DS1 *imu)
 {
   // To read from the accelerometer, you must first call the
   // readAccel() function. When this exits, it'll update the
@@ -250,7 +251,7 @@ void printAccel(LSM9DS1 &imu)
 
 }
 
-void printMag(LSM9DS1 &imu)
+void printMag(LSM9DS1 *imu)
 {
   // To read from the magnetometer, you must first call the
   // readMag() function. When this exits, it'll update the
