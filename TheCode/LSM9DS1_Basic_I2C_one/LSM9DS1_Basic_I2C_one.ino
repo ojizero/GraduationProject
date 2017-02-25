@@ -97,7 +97,7 @@ void setup()
 {
 	int select_line = 0;
 
-Wire.begin();
+  Wire.begin();
 	Serial.begin(115200);
 
   // Before initializing the IMU, there are a few settings
@@ -106,38 +106,50 @@ Wire.begin();
 	imu.settings.device.commInterface = IMU_MODE_I2C;
 	imu.settings.device.mAddress = LSM9DS1_M;
 	imu.settings.device.agAddress = LSM9DS1_AG;
-	tcaselect(2);
-  // The above lines will only take effect AFTER calling
-  // imu.begin(), which verifies communication with the IMU
-  // and turns it on.
-	if (!imu.begin())
-	{
-		Serial.println("Failed to communicate with LSM9DS1.");
-		//Serial.println("Double-check wiring.");
-		//Serial.println("Default settings in this sketch will " \
-			"work for an out of the box LSM9DS1 " \
-			"Breakout, but may need to be modified " \
-			"if the board jumpers are.");
-		while (1)
-			;
-	}
+
+  for (int i=2; i<=6; i++) {
+  	tcaselect(i);
+    // The above lines will only take effect AFTER calling
+    // imu.begin(), which verifies communication with the IMU
+    // and turns it on.
+  	if (!imu.begin())
+  	{
+  		Serial.println("Failed to communicate with LSM9DS1.");
+  		//Serial.println("Double-check wiring.");
+  		//Serial.println("Default settings in this sketch will " \
+  			"work for an out of the box LSM9DS1 " \
+  			"Breakout, but may need to be modified " \
+  			"if the board jumpers are.");
+  		while (1)
+  			;
+  	}
+  }
+
+  while (!Serial.available())
+    ;
+  
+  // The loop outside The Loop
+  while (1) {
+    for (int i=2; i<=6; i++) {
+      tcaselect(i);
+      Serial.print( (i!=2)?(", "):("") );
+      printGyro();  // Print "G: gx, gy, gz"
+      printAccel(); // Print "A: ax, ay, az"
+      printMag();   // Print "M: mx, my, mz"
+      
+      // Print the heading and orientation for fun!
+      // Call print attitude. The LSM9DS1's magnetometer x and y
+      // axes are opposite to the accelerometer, so my and mx are
+      // substituted for each other.
+//      printAttitude(imu.ax, imu.ay, imu.az, -imu.my, -imu.mx, imu.mz);
+//      delay(PRINT_SPEED);
+    }
+    Serial.println();
+  }
 }
 
 void loop()
-{
-  	printGyro();  // Print "G: gx, gy, gz"
-  	printAccel(); // Print "A: ax, ay, az"
-  	printMag();   // Print "M: mx, my, mz"
-    
-  	// Print the heading and orientation for fun!
-  	// Call print attitude. The LSM9DS1's magnetometer x and y
-  	// axes are opposite to the accelerometer, so my and mx are
-  	// substituted for each other.
-  	printAttitude(imu.ax, imu.ay, imu.az, -imu.my, -imu.mx, imu.mz);
-  	Serial.println();
-  
-  	delay(PRINT_SPEED);
-}
+{}
 
 void printGyro()
 {
@@ -148,7 +160,7 @@ void printGyro()
 
   // Now we can use the gx, gy, and gz variables as we please.
   // Either print them as raw ADC values, or calculated in DPS.
-	Serial.print("G: ");
+//	Serial.print("G: ");
 #ifdef PRINT_CALCULATED
   // If you want to print calculated values, you can use the
   // calcGyro helper function to convert a raw ADC value to
@@ -158,13 +170,15 @@ void printGyro()
 	Serial.print(imu.calcGyro(imu.gy), 2);
 	Serial.print(", ");
 	Serial.print(imu.calcGyro(imu.gz), 2);
-	Serial.println(" deg/s");
+  Serial.print(", ");
+//	Serial.println(" deg/s");
 #elif defined PRINT_RAW
 	Serial.print(imu.gx);
 	Serial.print(", ");
 	Serial.print(imu.gy);
 	Serial.print(", ");
-	Serial.println(imu.gz);
+	Serial.print(imu.gz);
+  Serial.print(", ");
 #endif
 }
 
@@ -177,7 +191,7 @@ void printAccel()
 
   // Now we can use the ax, ay, and az variables as we please.
   // Either print them as raw ADC values, or calculated in g's.
-	Serial.print("A: ");
+//	Serial.print("A: ");
 #ifdef PRINT_CALCULATED
   // If you want to print calculated values, you can use the
   // calcAccel helper function to convert a raw ADC value to
@@ -187,13 +201,15 @@ void printAccel()
 	Serial.print(imu.calcAccel(imu.ay), 2);
 	Serial.print(", ");
 	Serial.print(imu.calcAccel(imu.az), 2);
-	Serial.println(" g");
+  Serial.print(", ");
+//	Serial.println(" g");
 #elif defined PRINT_RAW 
 	Serial.print(imu.ax);
 	Serial.print(", ");
 	Serial.print(imu.ay);
 	Serial.print(", ");
-	Serial.println(imu.az);
+	Serial.print(imu.az);
+  Serial.print(", ");
 #endif
 
 }
@@ -207,7 +223,7 @@ void printMag()
 
   // Now we can use the mx, my, and mz variables as we please.
   // Either print them as raw ADC values, or calculated in Gauss.
-	Serial.print("M: ");
+//	Serial.print("M: ");
 #ifdef PRINT_CALCULATED
   // If you want to print calculated values, you can use the
   // calcMag helper function to convert a raw ADC value to
@@ -217,13 +233,15 @@ void printMag()
 	Serial.print(imu.calcMag(imu.my), 2);
 	Serial.print(", ");
 	Serial.print(imu.calcMag(imu.mz), 2);
-	Serial.println(" gauss");
+//  Serial.print(", ")
+//	Serial.println(" gauss");
 #elif defined PRINT_RAW
 	Serial.print(imu.mx);
 	Serial.print(", ");
 	Serial.print(imu.my);
 	Serial.print(", ");
-	Serial.println(imu.mz);
+	Serial.print(imu.mz);
+//  Serial.print(", ");
 #endif
 }
 

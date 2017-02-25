@@ -15,12 +15,12 @@ SFE_LSM9DS1 library. It'll demo the following:
   variables section).
 * How to use the begin() function of the LSM9DS1 class.
 * How to read the gyroscope, accelerometer, and magnetometer
-  using the readGryo(), readAccel(), readMag() functions and 
+  using the readGryo(), readAccel(), readMag() functions and
   the gx, gy, gz, ax, ay, az, mx, my, and mz variables.
-* How to calculate actual acceleration, rotation speed, 
-  magnetic field strength using the calcAccel(), calcGyro() 
+* How to calculate actual acceleration, rotation speed,
+  magnetic field strength using the calcAccel(), calcGyro()
   and calcMag() functions.
-* How to use the data from the LSM9DS1 to calculate 
+* How to use the data from the LSM9DS1 to calculate
   orientation and heading.
 
 Hardware setup: This library supports communicating with the
@@ -31,12 +31,12 @@ to use I2C. The pin-out is as follows:
 	 SDA ---------- SDA (A4 on older 'Duinos')
 	 VDD ------------- 3.3V
 	 GND ------------- GND
-(CSG, CSXM, SDOG, and SDOXM should all be pulled high. 
+(CSG, CSXM, SDOG, and SDOXM should all be pulled high.
 Jumpers on the breakout board will do this for you.)
 
 The LSM9DS1 has a maximum voltage of 3.6V. Make sure you power it
-off the 3.3V rail! I2C pins are open-drain, so you'll be 
-(mostly) safe connecting the LSM9DS1's SCL and SDA pins 
+off the 3.3V rail! I2C pins are open-drain, so you'll be
+(mostly) safe connecting the LSM9DS1's SCL and SDA pins
 directly to the Arduino.
 
 Development environment specifics:
@@ -44,8 +44,8 @@ Development environment specifics:
 	Hardware Platform: SparkFun Redboard
 	LSM9DS1 Breakout Version: 1.0
 
-This code is beerware. If you see me (or any other SparkFun 
-employee) at the local, and you've found our code helpful, 
+This code is beerware. If you see me (or any other SparkFun
+employee) at the local, and you've found our code helpful,
 please buy us a round!
 
 Distributed as-is; no warranty is given.
@@ -77,8 +77,8 @@ LSM9DS1 imu_2, imu_3, imu_4, imu_5, imu_6;
 //#define PRINT_RAW
 #define PRINT_SPEED 250 // 250 ms between prints
 
-// Earth's magnetic field varies by location. Add or subtract 
-// a declination to get a more accurate heading. Calculate 
+// Earth's magnetic field varies by location. Add or subtract
+// a declination to get a more accurate heading. Calculate
 // your's here:
 // http://www.ngdc.noaa.gov/geomag-web/#declination
 #define DECLINATION -8.58 // Declination (degrees) in Boulder, CO.
@@ -87,41 +87,145 @@ LSM9DS1 imu_2, imu_3, imu_4, imu_5, imu_6;
 
 uint8_t select_line;
 
-void tcaselect(uint8_t i) 
+void tcaselect(uint8_t i)
 {
 	if (i > 7) return;
-	
+
 	Wire.beginTransmission(TCAADDR);
 	Wire.write(1 << i);
-	Wire.endTransmission();  
+	Wire.endTransmission();
 }
 
-void setup() 
+void setup()
 {
-	
-
 	Wire.begin();
 	Serial.begin(115200);
 
 	//Init IMU 1
 	tcaselect(2);
-	imuMuxInit(imu_2);
+	// imuMuxInit(imu_2);
+
+	imu_2.settings.device.commInterface = IMU_MODE_I2C;
+	imu_2.settings.device.mAddress = LSM9DS1_M;
+	imu_2.settings.device.agAddress = LSM9DS1_AG;
+
+	//tcaselect(2);
+
+  // The above lines will only take effect AFTER calling
+  // imu.begin(), which verifies communication with the IMU
+  // and turns it on.
+	if (!imu_2.begin())
+	{
+		Serial.println("Failed to communicate with LSM9DS1.");
+		//Serial.println("Double-check wiring.");
+		//Serial.println("Default settings in this sketch will " \
+			"work for an out of the box LSM9DS1 " \
+			"Breakout, but may need to be modified " \
+			"if the board jumpers are.");
+		while (1)
+			;
+	}
 
 	//Init IMU 2
 	tcaselect(3);
-	imuMuxInit(imu_3);
+	// imuMuxInit(imu_3);
+
+	imu_3.settings.device.commInterface = IMU_MODE_I2C;
+	imu_3.settings.device.mAddress = LSM9DS1_M;
+	imu_3.settings.device.agAddress = LSM9DS1_AG;
+
+	//tcaselect(2);
+
+  // The above lines will only take effect AFTER calling
+  // imu.begin(), which verifies communication with the IMU
+  // and turns it on.
+	if (!imu_3.begin())
+	{
+		Serial.println("Failed to communicate with LSM9DS1.");
+		//Serial.println("Double-check wiring.");
+		//Serial.println("Default settings in this sketch will " \
+			"work for an out of the box LSM9DS1 " \
+			"Breakout, but may need to be modified " \
+			"if the board jumpers are.");
+		while (1)
+			;
+	}
 
 	//Init IMU 3
 	tcaselect(4);
-	imuMuxInit(imu_4);
+	// imuMuxInit(imu_4);
+
+	imu_4.settings.device.commInterface = IMU_MODE_I2C;
+	imu_4.settings.device.mAddress = LSM9DS1_M;
+	imu_4.settings.device.agAddress = LSM9DS1_AG;
+
+	//tcaselect(2);
+
+  // The above lines will only take effect AFTER calling
+  // imu.begin(), which verifies communication with the IMU
+  // and turns it on.
+	if (!imu_4.begin())
+	{
+		Serial.println("Failed to communicate with LSM9DS1.");
+		//Serial.println("Double-check wiring.");
+		//Serial.println("Default settings in this sketch will " \
+			"work for an out of the box LSM9DS1 " \
+			"Breakout, but may need to be modified " \
+			"if the board jumpers are.");
+		while (1)
+			;
+	}
 
 	//Init IMU 4
 	tcaselect(5);
-	imuMuxInit(imu_5);	
+	// imuMuxInit(imu_5);
+
+	imu_5.settings.device.commInterface = IMU_MODE_I2C;
+	imu_5.settings.device.mAddress = LSM9DS1_M;
+	imu_5.settings.device.agAddress = LSM9DS1_AG;
+
+	//tcaselect(2);
+
+  // The above lines will only take effect AFTER calling
+  // imu.begin(), which verifies communication with the IMU
+  // and turns it on.
+	if (!imu_5.begin())
+	{
+		Serial.println("Failed to communicate with LSM9DS1.");
+		//Serial.println("Double-check wiring.");
+		//Serial.println("Default settings in this sketch will " \
+			"work for an out of the box LSM9DS1 " \
+			"Breakout, but may need to be modified " \
+			"if the board jumpers are.");
+		while (1)
+			;
+	}
 
 	//Init IMU 5
 	tcaselect(6);
-	imuMuxInit(imu_6);
+	// imuMuxInit(imu_6);
+
+	imu_6.settings.device.commInterface = IMU_MODE_I2C;
+	imu_6.settings.device.mAddress = LSM9DS1_M;
+	imu_6.settings.device.agAddress = LSM9DS1_AG;
+
+	//tcaselect(2);
+
+  // The above lines will only take effect AFTER calling
+  // imu.begin(), which verifies communication with the IMU
+  // and turns it on.
+	if (!imu_6.begin())
+	{
+		Serial.println("Failed to communicate with LSM9DS1.");
+		//Serial.println("Double-check wiring.");
+		//Serial.println("Default settings in this sketch will " \
+			"work for an out of the box LSM9DS1 " \
+			"Breakout, but may need to be modified " \
+			"if the board jumpers are.");
+		while (1)
+			;
+	}
+
 }
 
 void loop()
@@ -130,9 +234,9 @@ void loop()
 	tcaselect(2);
 	imuDisplayData(imu_2);
 	delay(1000);
-  	//IMU 2
-  	tcaselect(3);
-  	imuDisplayData(imu_3);
+	//IMU 2
+	tcaselect(3);
+	imuDisplayData(imu_3);
 	delay(1000);
 	//IMU 3
 	tcaselect(4);
@@ -156,7 +260,7 @@ void imuDisplayData(LSM9DS1 imu)
   	printGyro(imu);  // Print "G: gx, gy, gz"
   	printAccel(imu); // Print "A: ax, ay, az"
   	printMag(imu);   // Print "M: mx, my, mz"
-  
+
   	// Print the heading and orientation for fun!
   	// Call print attitude. The LSM9DS1's magnetometer x and y
   	// axes are opposite to the accelerometer, so my and mx are
@@ -242,7 +346,7 @@ void printAccel(LSM9DS1 imu)
 	Serial.print(", ");
 	Serial.print(imu.calcAccel(imu.az), 2);
 	Serial.println(" g");
-#elif defined PRINT_RAW 
+#elif defined PRINT_RAW
 	Serial.print(imu.ax);
 	Serial.print(", ");
 	Serial.print(imu.ay);
