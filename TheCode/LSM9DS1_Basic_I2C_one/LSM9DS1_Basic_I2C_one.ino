@@ -61,7 +61,7 @@ Distributed as-is; no warranty is given.
 //////////////////////////
 // Use the LSM9DS1 class to create an object. [imu] can be
 // named anything, we'll refer to that throught the sketch.
-LSM9DS1 imu_2, imu_3, imu_4, imu_5, imu_6;
+LSM9DS1 imu;
 
 ///////////////////////
 // Example I2C Setup //
@@ -84,9 +84,6 @@ LSM9DS1 imu_2, imu_3, imu_4, imu_5, imu_6;
 #define DECLINATION -8.58 // Declination (degrees) in Boulder, CO.
 
 #define TCAADDR 0x70
-
-uint8_t select_line;
-
 void tcaselect(uint8_t i) 
 {
 	if (i > 7) return;
@@ -98,85 +95,18 @@ void tcaselect(uint8_t i)
 
 void setup() 
 {
-	
+	int select_line = 0;
 
-	Wire.begin();
+Wire.begin();
 	Serial.begin(115200);
 
-	//Init IMU 1
-	tcaselect(2);
-	imuMuxInit(imu_2);
-
-	//Init IMU 2
-	tcaselect(3);
-	imuMuxInit(imu_3);
-
-	//Init IMU 3
-	tcaselect(4);
-	imuMuxInit(imu_4);
-
-	//Init IMU 4
-	tcaselect(5);
-	imuMuxInit(imu_5);	
-
-	//Init IMU 5
-	tcaselect(6);
-	imuMuxInit(imu_6);
-}
-
-void loop()
-{
-	//IMU 1
-	tcaselect(2);
-	imuDisplayData(imu_2);
-	delay(1000);
-  	//IMU 2
-  	tcaselect(3);
-  	imuDisplayData(imu_3);
-	delay(1000);
-	//IMU 3
-	tcaselect(4);
-	imuDisplayData(imu_4);
-	delay(1000);
-	//IMU 4
-	tcaselect(5);
-	imuDisplayData(imu_5);
-	delay(1000);
-	//IMU 5
-	tcaselect(6);
-	imuDisplayData(imu_6);
-	delay(1000);
-
-	//delay(PRINT_SPEED);
-}
-
-void imuDisplayData(LSM9DS1 imu)
-{
-
-  	printGyro(imu);  // Print "G: gx, gy, gz"
-  	printAccel(imu); // Print "A: ax, ay, az"
-  	printMag(imu);   // Print "M: mx, my, mz"
-  
-  	// Print the heading and orientation for fun!
-  	// Call print attitude. The LSM9DS1's magnetometer x and y
-  	// axes are opposite to the accelerometer, so my and mx are
-  	// substituted for each other.
-  	printAttitude(imu.ax, imu.ay, imu.az, -imu.my, -imu.mx, imu.mz);
-  	Serial.println();
-
-}
-
-void imuMuxInit(LSM9DS1 imu)
-{
   // Before initializing the IMU, there are a few settings
   // we may need to adjust. Use the settings struct to set
   // the device's communication mode and addresses:
 	imu.settings.device.commInterface = IMU_MODE_I2C;
 	imu.settings.device.mAddress = LSM9DS1_M;
 	imu.settings.device.agAddress = LSM9DS1_AG;
-
-	//tcaselect(2);
-
+	tcaselect(2);
   // The above lines will only take effect AFTER calling
   // imu.begin(), which verifies communication with the IMU
   // and turns it on.
@@ -193,7 +123,23 @@ void imuMuxInit(LSM9DS1 imu)
 	}
 }
 
-void printGyro(LSM9DS1 imu)
+void loop()
+{
+  	printGyro();  // Print "G: gx, gy, gz"
+  	printAccel(); // Print "A: ax, ay, az"
+  	printMag();   // Print "M: mx, my, mz"
+    
+  	// Print the heading and orientation for fun!
+  	// Call print attitude. The LSM9DS1's magnetometer x and y
+  	// axes are opposite to the accelerometer, so my and mx are
+  	// substituted for each other.
+  	printAttitude(imu.ax, imu.ay, imu.az, -imu.my, -imu.mx, imu.mz);
+  	Serial.println();
+  
+  	delay(PRINT_SPEED);
+}
+
+void printGyro()
 {
   // To read from the gyroscope, you must first call the
   // readGyro() function. When this exits, it'll update the
@@ -222,7 +168,7 @@ void printGyro(LSM9DS1 imu)
 #endif
 }
 
-void printAccel(LSM9DS1 imu)
+void printAccel()
 {
   // To read from the accelerometer, you must first call the
   // readAccel() function. When this exits, it'll update the
@@ -252,7 +198,7 @@ void printAccel(LSM9DS1 imu)
 
 }
 
-void printMag(LSM9DS1 imu)
+void printMag()
 {
   // To read from the magnetometer, you must first call the
   // readMag() function. When this exits, it'll update the
