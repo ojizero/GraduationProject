@@ -10,7 +10,7 @@ twitter.com/emlidtech || www.emlid.com || info@emlid.com
 #ifndef AHRS_HPP
 #define AHRS_HPP
 
-#include <cmath>
+#include <math.h>
 #include <stdio.h>
 
 class AHRS{
