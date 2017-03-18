@@ -12,6 +12,7 @@ twitter.com/emlidtech || www.emlid.com || info@emlid.com
 
 #include <math.h>
 #include <stdio.h>
+#include <Wire.h>
 
 class AHRS{
 private:

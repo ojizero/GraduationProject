@@ -60,7 +60,8 @@ def Draw():
 	while True:
 		ready = select.select([serial_reader], [], [], 0.025)
 		if ready[0]:
-			data = serial_reader.readline().split(',')
+			data = serial_reader.readline().decode().split(',')
+			print(data)
 
 			if len(data) >= 4:
 				w = float(data[0])
