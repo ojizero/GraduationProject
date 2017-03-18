@@ -56,7 +56,7 @@ def Draw():
 	global x, y, z, w
 
 	# ------------------------- Parsing IMU data ------------------------------
-
+	serial_reader.write(b'r')
 	while True:
 		ready = select.select([serial_reader], [], [], 0.025)
 		if ready[0]:
