@@ -102,7 +102,9 @@ def Draw():
 
 #================================ Main ========================================
 
-serial_reader = serial.Serial('/dev/ttyACM0', 115200)
+serial_port = '/dev/cu.usbmodem1411' # '/dev/ttyACM0' # for linux
+
+serial_reader = serial.Serial(serial_port, 115200)
 
 glutInit(sys.argv)
 glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE)
