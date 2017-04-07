@@ -46,7 +46,7 @@ def data_splicer (
 class Splicer:
 	def __init__ (
 		self, smoothing_window=5,
-		threshold=0.0, increase_factor=1.1, decrease_factor=0.9, samples_cutoff=5,
+		threshold=0.0, increase_factor=1.001, decrease_factor=0.999, samples_cutoff=50,
 		accl_ratio=1.0, gyro_ratio=1.0, magnitude_method=_euclidean_magnitude
 	):
 		self.threshold = threshold
@@ -98,36 +98,22 @@ class Splicer:
 
 		return np.array(list(map(_averager, range(len(data_array))))[slicer_index:])
 
-	# redo with a loop
-	# one threshold has a much simpler code compared to two thresholds
+	# doesn't handle updates to threshold
 	def splice_samples (self, intensities, number_of_samples=self.samples_cutoff, threshold=self.threshold, increase_factor=self.increase_factor, decrease_factor=self.decrease_factor):
+		# indices = [0]
+		def _splicer (index):
+			return all(np.nan_to_num(intensities[index-number_of_samples:index]) < threshold)
 
-		## not sure if the commented part and the not commented part are equal
-		# start = True
-		# def _splicer (index):
-		# 	cond = all(intensities[index - number_of_samples:index] < threshold)
+		indices = map(_splicer, range(len(intensities)))
 
-		# 	if not cond:
-		# 		if start:
-		# 			threshold *= decrease_factor
-		# 		else:
-		# 			threshold *= increase_factor
-		# 		start = not start
+		return [xi for i, xi in enumerate(indices) if i + 1 == len(indices) or indices[i+1] - xi != 1]
 
-		# 	return cond
 
-		# return filter(_splicer, range(len(intensities)))
 
-		indices = []
-		start_end = True # starting values
-		for index, value in enumerate(intensities):
-			if all(intensities[index - number_of_samples:index] < threshold):
-				indices += [index]
-				start_end = not start_end
-			else:
-				if start_end:
-					threshold *= decrease_factor
-				else:
-					threshold *= increase_factor
-
-		return indices
+# ## threshold update can cause a HUGE issue !!!
+# # assuming a start of 10 for threshold
+# t = 10
+# #  over 2000 samples an increase ration of 1% can grow to extremely high values
+# for _ in range(2000):
+# 	t *= 1.01
+# t # outputs 4392862050.501046
