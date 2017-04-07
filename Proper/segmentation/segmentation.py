@@ -124,9 +124,10 @@ class Splicer:
 		indices = map(_splicer, range(len(intensities)))
 
 		# assuming ennu el lists would be of equal length
+		# which they should
 		return list ( zip (
-			[xi for i, xi in enumerate(indices) if i + 1 == len(indices) or indices[i+1] - xi != 1],
-			[xi for i, xi in enumerate(indices) if i == 0 or xi - indices[i-1] != 1]
+			[xi for i, xi in enumerate(indices) if i == 0 or xi - indices[i-1] != 1],
+			[xi for i, xi in enumerate(indices) if i + 1 == len(indices) or indices[i+1] - xi != 1]
 		))
 
 # ## threshold update can cause a HUGE issue !!!
