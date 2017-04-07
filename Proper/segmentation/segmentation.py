@@ -99,7 +99,7 @@ class Splicer:
 		return np.array(list(map(_averager, range(len(data_array))))[slicer_index:])
 
 	# doesn't handle updates to threshold
-	def splice_samples (self, intensities, number_of_samples=self.samples_cutoff, threshold=self.threshold, increase_factor=self.increase_factor, decrease_factor=self.decrease_factor):
+	def starting_indices (self, intensities, number_of_samples=self.samples_cutoff, threshold=self.threshold, increase_factor=self.increase_factor, decrease_factor=self.decrease_factor):
 		# indices = [0]
 		def _splicer (index):
 			return all(np.nan_to_num(intensities[index-number_of_samples:index]) < threshold)
@@ -108,7 +108,26 @@ class Splicer:
 
 		return [xi for i, xi in enumerate(indices) if i + 1 == len(indices) or indices[i+1] - xi != 1]
 
+	def ending_indices (self, intensities, number_of_samples=self.samples_cutoff, threshold=self.threshold, increase_factor=self.increase_factor, decrease_factor=self.decrease_factor):
+		# indices = [0]
+		def _splicer (index):
+			return all(np.nan_to_num(intensities[index-number_of_samples:index]) < threshold)
 
+		indices = map(_splicer, range(len(intensities)))
+
+		return [xi for i, xi in enumerate(indices) if i == 0 or xi - indices[i-1] != 1]
+
+	def silence_segments (self, intensities, number_of_samples=self.samples_cutoff, threshold=self.threshold, increase_factor=self.increase_factor, decrease_factor=self.decrease_factor):
+		def _splicer (index):
+			return all(np.nan_to_num(intensities[index-number_of_samples:index]) < threshold)
+
+		indices = map(_splicer, range(len(intensities)))
+
+		# assuming ennu el lists would be of equal length
+		return list ( zip (
+			[xi for i, xi in enumerate(indices) if i + 1 == len(indices) or indices[i+1] - xi != 1],
+			[xi for i, xi in enumerate(indices) if i == 0 or xi - indices[i-1] != 1]
+		))
 
 # ## threshold update can cause a HUGE issue !!!
 # # assuming a start of 10 for threshold
