@@ -46,7 +46,7 @@ def data_splicer (
 class Splicer:
 	def __init__ (
 		self, smoothing_window=5,
-		threshold=0.0, increase_factor=1.001, decrease_factor=0.999, samples_cutoff=50,
+		threshold=0.0, increase_factor=1.0001, decrease_factor=0.9999, samples_cutoff=50,
 		accl_ratio=1.0, gyro_ratio=1.0, magnitude_method=_euclidean_magnitude
 	):
 		self.threshold = threshold
@@ -118,22 +118,29 @@ class Splicer:
 		return [xi for i, xi in enumerate(indices) if i == 0 or xi - indices[i-1] != 1]
 
 	def silence_segments (self, intensities, number_of_samples=self.samples_cutoff, threshold=self.threshold, increase_factor=self.increase_factor, decrease_factor=self.decrease_factor):
-		def _splicer (index):
-			return all(np.nan_to_num(intensities[index-number_of_samples:index]) < threshold)
+		def _silence_finder (index):
+			nonlocal threshold
+			silent = all(np.nan_to_num(intensities[index-number_of_samples:index]) < threshold)
 
-		indices = map(_splicer, range(len(intensities)))
+			if silent:
+				threshold *= decrease_factor
+			else:
+				threshold *= increase_factor
+
+			return silent
+
+		indices = [index for index in range(len(intensities)) if _silence_finder(index)]
 
 		# assuming ennu el lists would be of equal length
 		# which they should
-		return list ( zip (
-			[xi for i, xi in enumerate(indices) if i == 0 or xi - indices[i-1] != 1],
+		return list(zip (
+			[xi for i, xi in enumerate(indices) if i     == 0            or xi - indices[i-1] != 1],
 			[xi for i, xi in enumerate(indices) if i + 1 == len(indices) or indices[i+1] - xi != 1]
 		))
 
-# ## threshold update can cause a HUGE issue !!!
-# # assuming a start of 10 for threshold
-# t = 10
-# #  over 2000 samples an increase ration of 1% can grow to extremely high values
-# for _ in range(2000):
-# 	t *= 1.01
-# t # outputs 4392862050.501046
+	def splice_data (self, data, silence_segments):
+		segments = [(silence_segments[i-1][1], silence_segments[i][0]) for i in range(1, len(silence_segments))]
+		# try: # ugly but to be kept for nows
+		return [data[start:end,:] for start, end in segments]
+		# except IndexError:
+		# 	return [data[start:end] for start, end in silence_segments]

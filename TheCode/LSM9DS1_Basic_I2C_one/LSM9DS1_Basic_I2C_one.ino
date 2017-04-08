@@ -108,7 +108,7 @@ void setup()
 	imu.settings.device.mAddress = LSM9DS1_M;
 	imu.settings.device.agAddress = LSM9DS1_AG;
 
-  for (int i=4; i<=5; i++) {
+  for (int i=3; i<=7; i++) {
   	tcaselect(i);
     // The above lines will only take effect AFTER calling
     // imu.begin(), which verifies communication with the IMU
@@ -121,8 +121,10 @@ void setup()
   			"work for an out of the box LSM9DS1 " \
   			"Breakout, but may need to be modified " \
   			"if the board jumpers are.");
-  		while (1)
-  			;
+  		while (1) {
+        Serial.print("failed ---"); 
+  			Serial.println(i);
+  		}
   	}
   }
 
@@ -131,15 +133,15 @@ void setup()
 
   // The loop outside The Loop
   while (1) {
-    for (int i=4; i<=5; i++) {
+    for (int i=3; i<=7; i++) {
       tcaselect(i);
-      Serial.print( (i!=4)?(", "):("") );
+      Serial.print( (i!=3)?(", "):("") );
 
       // print_flag = i==3;
 
-      printGyro();  // Print "G: gx, gy, gz"
-      printAccel(); // Print "A: ax, ay, az"
-      printMag();   // Print "M: mx, my, mz"
+      printGyro();  // Print G: "gx, gy, gz"
+      printAccel(); // Print A: "ax, ay, az"
+      printMag();   // Print M: "mx, my, mz"
 
       // Print the heading and orientation for fun!
       // Call print attitude. The LSM9DS1's magnetometer x and y
