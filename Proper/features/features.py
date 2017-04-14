@@ -16,19 +16,19 @@ class Extractor:
 
 	## Features to be used
 	def _autocorrelate_feature (self, data_windowed):
-		return np.array([np.correlate(data_window, data_window, mode='full') for data_window in data_windowed])
+		return np.array(np.nan_to_num([np.correlate(data_window, data_window, mode='full') for data_window in data_windowed]))
 
 	def _mean_feature (self, data_windowed):
-		return np.array([np.average(data_window) for data_window in data_windowed])
+		return np.array(np.nan_to_num([np.average(data_window) for data_window in data_windowed]))
 
 	def _variance_feature (self, data_windowed):
-		return np.array([np.var(data_window) for data_window in data_windowed])
+		return np.array(np.nan_to_num([np.var(data_window) for data_window in data_windowed]))
 
 	def _skeyness_feature (self, data_windowed):
-		return np.array([st.skew(data_window) for data_window in data_windowed])
+		return np.array(np.nan_to_num([st.skew(data_window) for data_window in data_windowed]))
 
 	def _kurtoises_feature (self, data_windowed):
-		return np.array([st.kurtosis(data_window) for data_window in data_windowed])
+		return np.array(np.nan_to_num([st.kurtosis(data_window) for data_window in data_windowed]))
 
 	def _signal_magnitude_area_feature (self, data_windowed):
 		# return []

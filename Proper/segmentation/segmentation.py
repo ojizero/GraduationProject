@@ -110,3 +110,7 @@ class Splicer:
 	def splice_data (self, data, silence_segments):
 		segments = [(silence_segments[i-1][1], silence_segments[i][0]) for i in range(1, len(silence_segments))]
 		return [data[start:end] for start, end in segments]
+
+
+if __name__ == '__main__':
+	pass
