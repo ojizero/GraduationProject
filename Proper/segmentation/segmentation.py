@@ -130,8 +130,24 @@ class Splicer:
 
 if __name__ == '__main__':
 	data_streams = [] ## array of arrays, each array is a data stream
-	splicers     = [Splicer(data_stream) for data_stream in data_streams]
 
-	silence_segments = [
-		splicers[index].silence_segments() for index in range(len(data_streams))
-	]
+	### 3 ways
+	## 1. sum all data, perform one splicer
+	streams_sum = np.sum(data_streams, 0)
+	s = Splicer(streams_sum)
+	silence_segments = s.silence_segments()
+
+	## 2. sum all magnitudes, perform one splicer
+	s = Splicer()
+	intensities_sum = sum([s.measure_intensity(stream) for stream in data_streams])
+	silence_segments = s.silence_segments(intensities_sum) ## use for spliting
+
+	## 3. perfrom many splicers, get intersections
+	splicers = [Splicer(data_stream) for data_stream in data_streams]
+	silence_segments = list(zip([
+			splicers[index].silence_segments() for index in range(len(data_streams))
+		]))
+	silence_intersects = [
+		(max([start for start, _ in intersection]), min([end for _, end in intersection]))
+			for intersection in silence_segments
+	] ## use for spliting
