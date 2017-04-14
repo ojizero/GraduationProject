@@ -98,25 +98,6 @@ class Splicer:
 
 		return np.array(list(map(_averager, range(len(data_array))))[slicer_index:])
 
-	# doesn't handle updates to threshold
-	def starting_indices (self, intensities, number_of_samples=self.samples_cutoff, threshold=self.threshold, increase_factor=self.increase_factor, decrease_factor=self.decrease_factor):
-		# indices = [0]
-		def _splicer (index):
-			return all(np.nan_to_num(intensities[index-number_of_samples:index]) < threshold)
-
-		indices = map(_splicer, range(len(intensities)))
-
-		return [xi for i, xi in enumerate(indices) if i + 1 == len(indices) or indices[i+1] - xi != 1]
-
-	def ending_indices (self, intensities, number_of_samples=self.samples_cutoff, threshold=self.threshold, increase_factor=self.increase_factor, decrease_factor=self.decrease_factor):
-		# indices = [0]
-		def _splicer (index):
-			return all(np.nan_to_num(intensities[index-number_of_samples:index]) < threshold)
-
-		indices = map(_splicer, range(len(intensities)))
-
-		return [xi for i, xi in enumerate(indices) if i == 0 or xi - indices[i-1] != 1]
-
 	def silence_segments (self, intensities, number_of_samples=self.samples_cutoff, threshold=self.threshold, increase_factor=self.increase_factor, decrease_factor=self.decrease_factor):
 		def _silence_finder (index):
 			nonlocal threshold
@@ -140,7 +121,4 @@ class Splicer:
 
 	def splice_data (self, data, silence_segments):
 		segments = [(silence_segments[i-1][1], silence_segments[i][0]) for i in range(1, len(silence_segments))]
-		# try: # ugly but to be kept for nows
-		return [data[start:end,:] for start, end in segments]
-		# except IndexError:
-		# 	return [data[start:end] for start, end in silence_segments]
+		return [data[start:end] for start, end in segments]
