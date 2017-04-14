@@ -5,7 +5,9 @@ class Extractor:
 	def __init___feature (self, window_size=20):
 		self.window_size = window_size
 
-	def claculate_features (self, data, window_size=self.window_size):
+	def claculate_features (self, data, window_size=None):
+		if window_size is None:
+			window_size = self.window_size
 		# window the data
 		data_windowed = [data[index-window_size//2:index+window_size//2] for index in range(window_size//2,len(data)-window_size//2)]
 		#call extract_features
