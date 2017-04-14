@@ -34,8 +34,8 @@ def _euclidean_magnitude (data_point):
 class Splicer:
 	def __init__ (
 		self, smoothing_window=50,
-		threshold=0.0, increase_factor=1.0001, decrease_factor=0.9999, samples_cutoff=50,
-		accl_ratio=1.0, gyro_ratio=1.0, magnitude_method=_euclidean_magnitude
+		threshold=10.0, increase_factor=1.0001, decrease_factor=0.9999, samples_cutoff=50,
+		accl_ratio=0.0, gyro_ratio=1.0, magnitude_method=_euclidean_magnitude
 	):
 		self.threshold = threshold
 
