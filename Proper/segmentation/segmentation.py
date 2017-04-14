@@ -33,23 +33,7 @@ def _euclidean_magnitude (data_point):
 
 class Splicer:
 	def __init__ (
-		self, smoothing_window=50,
-		threshold=10.0, increase_factor=1.0001, decrease_factor=0.9999, samples_cutoff=50,
-		accl_ratio=0.0, gyro_ratio=1.0, magnitude_method=_euclidean_magnitude
-	):
-		self.threshold = threshold
-
-		self.increase_factor = increase_factor
-		self.decrease_factor = decrease_factor
-		self.samples_cutoff  = samples_cutoff
-
-		self.accl_ratio = accl_ratio
-		self.gyro_ratio = gyro_ratio
-
-		self.smoothing_window  = tuple([0 for _ in range(smoothing_window)])
-
-	def __init__ (
-		self, data_stream, smoothing_window=50,
+		self, data_stream=None, smoothing_window=50,
 		threshold=10.0, increase_factor=1.0001, decrease_factor=0.9999, samples_cutoff=50,
 		accl_ratio=0.0, gyro_ratio=1.0, magnitude_method=_euclidean_magnitude
 	):
@@ -145,10 +129,9 @@ class Splicer:
 
 
 if __name__ == '__main__':
-	arr      = [] ## array of arrays, each array is a data stream
-	splicers = [Splicer() for _ in arr]
+	data_streams = [] ## array of arrays, each array is a data stream
+	splicers     = [Splicer(data_stream) for data_stream in data_streams]
 
 	silence_segments = [
-		splicers[index].silence_segments(splicers[index].measure_intensity(arr[index]))
-			for index in range(len(arr))
+		splicers[index].silence_segments() for index in range(len(data_streams))
 	]
