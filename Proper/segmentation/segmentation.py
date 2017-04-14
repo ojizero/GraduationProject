@@ -5,18 +5,6 @@ from math import sqrt
 def _euclidean_magnitude (data_point):
 	return sqrt(sum(map(lambda d: d**2, data_point)))
 
-def intensity_calculator (data_array, gyro_ratio=1.0, accl_ratio=1.0, magnitude=_euclidean_magnitude):
-	gyro_data = np.array(list(map(magnitude, data_array[:,0:3])))
-	accl_data = np.array(list(map(magnitude, data_array[:,3:6])))
-	return ((gyro_ratio * gyro_data) + (accl_ratio * accl_data))
-
-def data_splicer (
-	intensities, startup_theshold, slowdown_threshold,
-	startup_increase_factor, startup_decrease_factor,
-	slowdown_increase_factor, slowdown_decrease_factor
-):
-	pass
-
 ## gyro data more relevant for segmentation ?
 # data = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/echoed', delimiter=',')
 # data_no_motion = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/echoed_no_motion', delimiter=',')
@@ -45,7 +33,7 @@ def data_splicer (
 
 class Splicer:
 	def __init__ (
-		self, smoothing_window=5,
+		self, smoothing_window=50,
 		threshold=0.0, increase_factor=1.0001, decrease_factor=0.9999, samples_cutoff=50,
 		accl_ratio=1.0, gyro_ratio=1.0, magnitude_method=_euclidean_magnitude
 	):

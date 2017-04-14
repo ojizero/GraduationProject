@@ -1,41 +1,35 @@
 import numpy as np
-import scipy.stats as sp
+import scipy.stats as st
 
 class Extractor:
-	def __init__ (self, window_size=20):
-		pass
+	def __init___feature (self, window_size=20):
+		self.window_size = window_size
 
-	def claculate_features (self, data):
-		pass
-
-	# windowed_data = [data[index-(window_size//2):index+(window_size//2)] for index in range(window_size//2,len(data)-(window_size//2))]
-	def _autocorrelate (self, data_windowed):
-		return [np.correlate(data_window, data_window, mode='full') for data_window in data_windowed]
-
-	def _mean (self, data_windowed):
-		return [np.average(data_window) for data_window in data_windowed]
-
-	def _variance (self, data_windowed):
-		return [np.var(data_window) for data_window in data_windowed]
-
-	def _skeyness (self, data_windowed):
-		return [sp.skew(data_window) for data_window in data_windowed]
-
-	def _kurtoises (self, data_windowed):
-		return [sp.kurtosis(data_window) for data_window in data_windowed]
-
-	def _signal_magnitude_area (self, data_windowed):
-		# return []
-		pass
+	def claculate_features (self, data, window_size=self.window_size):
+		# window the data
+		data_windowed = [data[index-window_size//2:index+window_size//2] for index in range(window_size//2,len(data)-window_size//2)]
+		#call extract_features
+		return self.extract_features(data_windowed)
 
 	def extract_features (self, data):
-		feature_set = {(feature, eval('self.feature')) for feature in self.__dir__() if feature.endswith('_feature')}
-		features = {}
+		return {feature: eval('self.feature')(data) for feature in self.__dir__() if feature.endswith('_feature')}
 
-		for feature_name, feature_function in feature_set:
-			features[feature_name] = feature_function(data)
+	## Features to be used
+	def _autocorrelate_feature (self, data_windowed):
+		return np.array([np.correlate(data_window, data_window, mode='full') for data_window in data_windowed])
 
-		return features
+	def _mean_feature (self, data_windowed):
+		return np.array([np.average(data_window) for data_window in data_windowed])
 
-	def format_features (self, feature_set):
+	def _variance_feature (self, data_windowed):
+		return np.array([np.var(data_window) for data_window in data_windowed])
+
+	def _skeyness_feature (self, data_windowed):
+		return np.array([st.skew(data_window) for data_window in data_windowed])
+
+	def _kurtoises_feature (self, data_windowed):
+		return np.array([st.kurtosis(data_window) for data_window in data_windowed])
+
+	def _signal_magnitude_area_feature (self, data_windowed):
+		# return []
 		pass
