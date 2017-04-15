@@ -12,7 +12,7 @@ class Extractor:
 		data_windowed = [data[index-window_size//2:index+window_size//2] for index in range(window_size//2,len(data)-window_size//2)]
 		#call extract_features
 		# heek 3ala kul el columns one by one
-		return [self.extract_features(data_column) for data_column in data_windowed[:,:]]
+		return [self.extract_features(data_windowed[...,col]) for col in range(data_windowed.shape[-1])]
 
 	def extract_features (self, data_column):
 		return {feature: eval('self.%s'%feature)(data_column) for feature in self.__dir__() if feature.endswith('_feature')}
