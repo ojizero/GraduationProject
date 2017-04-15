@@ -14,7 +14,7 @@ class Extractor:
 		return self.extract_features(data_windowed)
 
 	def extract_features (self, data):
-		return {feature: eval('self.feature')(data) for feature in self.__dir__() if feature.endswith('_feature')}
+		return {feature: eval('self.%s'%feature)(data) for feature in self.__dir__() if feature.endswith('_feature')}
 
 	## Features to be used
 	def _autocorrelate_feature (self, data_windowed):
@@ -32,6 +32,22 @@ class Extractor:
 	def _kurtoises_feature (self, data_windowed):
 		return np.array(np.nan_to_num([st.kurtosis(data_window) for data_window in data_windowed]))
 
+	def _dft_feature (self, data_windowed):
+		return np.array(np.nan_to_num([np.fft(data_window) for data_window in data_windowed]))
+
+	def _entropy_feature (self, data_windowed):
+		return np.array(np.nan_to_num([st.entropy(data_window) for data_window in data_windowed]))
+
+	def _crosscorrelation_feature (self, data_windowed):
+		correlations_array = [np.correlate(data_window, np.concatenate(([0] * n, data_window[n:])), mode='full') for n in range(len(data_window))]
+
+		pass
+
+	def _power_spectum_density_feature (self, data_windowed):
+		return self._dft_feature(data_windowed) ** 2
+
+	def _dc_component_feature (self, data_windowed):
+		return self._power_spectum_density_feature(data_windowed)[0]
+
 	def _signal_magnitude_area_feature (self, data_windowed):
-		# return []
 		pass
