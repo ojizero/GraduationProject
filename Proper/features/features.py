@@ -5,13 +5,17 @@ class Extractor:
 	def __init___feature (self, window_size=20):
 		self.window_size = window_size
 
-	def claculate_features (self, data, window_size=None):
+	def claculate_features (self, data, window_size=None, multi=True):
 		if window_size is None:
 			window_size = self.window_size
+		if not multi:
+			data = np.array([data])
+
 		# window the data
-		data_windowed = [data[index-window_size//2:index+window_size//2] for index in range(window_size//2,len(data)-window_size//2)]
+		data_windowed = [data[:,index-window_size//2:index+window_size//2,...] for index in range(window_size//2,len(data)-window_size//2)]
 		#call extract_features
 		# heek 3ala kul el columns one by one
+		# returns an array R -> R[sensor][window][reading]['feature_method_name']
 		return [self.extract_features(data_windowed[...,col]) for col in range(data_windowed.shape[-1])]
 
 	def extract_features (self, data_column):
@@ -19,7 +23,9 @@ class Extractor:
 
 	## Features to be used
 	def _autocorrelate_feature (self, data_windowed):
-		return np.array(np.nan_to_num([np.correlate(data_window, data_window, mode='full') for data_window in data_windowed]))
+		return np.array(np.nan_to_num([
+			np.correlate(data_window, data_window, mode='full') for data_window in data_windowed
+		]))
 
 	def _mean_feature (self, data_windowed):
 		return np.array(np.nan_to_num([np.average(data_window) for data_window in data_windowed]))
@@ -27,7 +33,7 @@ class Extractor:
 	def _variance_feature (self, data_windowed):
 		return np.array(np.nan_to_num([np.var(data_window) for data_window in data_windowed]))
 
-	def _skeyness_feature (self, data_windowed):
+	def _skewness_feature (self, data_windowed):
 		return np.array(np.nan_to_num([st.skew(data_window) for data_window in data_windowed]))
 
 	def _kurtoises_feature (self, data_windowed):
