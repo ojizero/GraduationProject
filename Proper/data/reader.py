@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	import os
 	import serial
 	from sys import argv
-	from time import clock as now
+	from time import time as now
 
 	if len(argv) < 3:
 		raise ValueError('missing script arguments')
