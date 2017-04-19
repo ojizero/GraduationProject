@@ -14,7 +14,7 @@ if __name__ == '__main__':
 	import os
 	import serial
 	from sys import argv
-	from time import time as now
+	from time import sleep, time as now
 
 	if len(argv) < 3:
 		raise ValueError('missing script arguments')
@@ -28,6 +28,7 @@ if __name__ == '__main__':
 	if not os.path.exists('./%s' % letter):
 	    os.makedirs('./%s' % letter)
 
+	input('pausing')
 	s.write(b'r')
 	for _ in range(readings_count):
 		with open('./%s/%s.%s.csv' % (letter, letter, now()), 'wb') as f:
@@ -37,8 +38,9 @@ if __name__ == '__main__':
 					f.write(l)
 					print(now(), l.decode())
 				except KeyboardInterrupt:
+					# sleep(1)
+					input('pausing')
 					break
 				except Exception as e:
 					print('-=-=-=-=-=-= errored =-=-=-=-=-=-', e)
 					break
-
