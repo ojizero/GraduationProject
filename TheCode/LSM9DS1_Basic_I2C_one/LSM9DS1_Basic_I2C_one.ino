@@ -108,7 +108,7 @@ void setup()
 	imu.settings.device.mAddress = LSM9DS1_M;
 	imu.settings.device.agAddress = LSM9DS1_AG;
 
-  for (int i=3; i<=7; i++) {
+  for (int i=2; i<=7; i++) {
   	tcaselect(i);
     // The above lines will only take effect AFTER calling
     // imu.begin(), which verifies communication with the IMU
@@ -122,7 +122,7 @@ void setup()
   			"Breakout, but may need to be modified " \
   			"if the board jumpers are.");
   		while (1) {
-        Serial.print("failed ---"); 
+        Serial.print("failed --- "); 
   			Serial.println(i);
   		}
   	}
@@ -133,9 +133,9 @@ void setup()
 
   // The loop outside The Loop
   while (1) {
-    for (int i=3; i<=7; i++) {
+    for (int i=2; i<=7; i++) {
       tcaselect(i);
-      Serial.print( (i!=3)?(", "):("") );
+      Serial.print( (i!=2)?(", "):("") );
 
       // print_flag = i==3;
 
