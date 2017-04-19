@@ -33,8 +33,8 @@ def _euclidean_magnitude (data_point):
 
 class Splicer:
 	def __init__ (
-		self, data_stream=None, smoothing_window=50,
-		threshold=10.0, increase_factor=1.0001, decrease_factor=0.9999, samples_cutoff=50,
+		self, data_stream=None, smoothing_window=10,
+		threshold=75.0, increase_factor=1.001, decrease_factor=0.999, samples_cutoff=5,
 		accl_ratio=0.0, gyro_ratio=1.0, magnitude_method=_euclidean_magnitude
 	):
 		self.data_stream = data_stream
@@ -48,6 +48,7 @@ class Splicer:
 		self.gyro_ratio = gyro_ratio
 
 		self.smoothing_window  = tuple([0 for _ in range(smoothing_window)])
+		self.magnitude_method = magnitude_method
 
 
 
@@ -70,7 +71,7 @@ class Splicer:
 			averaging_window = self.smoothing_window
 
 		def _averager (index):
-			return np.nan_to_num(np.average((data_array[(index - averaging_window//2):(index + averaging_window//2)])))
+			return np.nan_to_num(np.average(data_array[(index - averaging_window//2):(index + averaging_window//2)]))
 
 		if type(averaging_window) == tuple:
 			# update smoothing window in instance
@@ -90,7 +91,6 @@ class Splicer:
 
 		return np.array(list(map(_averager, range(len(data_array))))[slicer_index:])
 
-	## NOT A VALID METHOD FOR DEFAULT VALUES FROM SELF !!!! >_<
 	def silence_segments (self, intensities=None, number_of_samples=None, threshold=None, increase_factor=None, decrease_factor=None):
 		if intensities is None:
 			intensities = self.measure_intensity(self.data_stream)
@@ -125,29 +125,50 @@ class Splicer:
 
 	def splice_data (self, data, silence_segments):
 		segments = [(silence_segments[i-1][1], silence_segments[i][0]) for i in range(1, len(silence_segments))]
-		return [data[start:end] for start, end in segments]
+		return [data[...,start:end,:] for start, end in segments]
 
 
 if __name__ == '__main__':
-	data_streams = [] ## array of arrays, each array is a data stream
+	# data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/Proper/alef.ba.alef.ba', delimiter=',')
+	# data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
-	### 3 ways
-	## 1. sum all data, perform one splicer
-	streams_sum = np.sum(data_streams, 0)
-	s = Splicer(streams_sum)
-	silence_segments = s.silence_segments()
+	# ### 3 ways
+	# ## 1. sum all data, perform one splicer
+	# streams_sum = np.sum(data_streams, 0)
+	# s = Splicer(streams_sum)
+	# silence_segments = s.silence_segments()
 
-	## 2. sum all magnitudes, perform one splicer
-	s = Splicer()
-	intensities_sum = sum([s.measure_intensity(stream) for stream in data_streams])
-	silence_segments = s.silence_segments(intensities_sum) ## use for spliting
+	# ## 2. sum all magnitudes, perform one splicer
+	# s = Splicer()
+	# intensities_sum = sum([s.measure_intensity(stream) for stream in data_streams])
+	# silence_segments = s.silence_segments(intensities_sum) ## use for spliting
 
-	## 3. perfrom many splicers, get intersections
-	splicers = [Splicer(data_stream) for data_stream in data_streams]
-	silence_segments = list(zip([
-			splicers[index].silence_segments() for index in range(len(data_streams))
-		]))
-	silence_intersects = [
-		(max([start for start, _ in intersection]), min([end for _, end in intersection]))
-			for intersection in silence_segments
-	] ## use for spliting
+	# ## 3. perfrom many splicers, get intersections
+	# splicers = [Splicer(data_stream) for data_stream in data_streams]
+	# silence_segments = list(zip(*[
+	# 		splicers[index].silence_segments() for index in range(len(data_streams))
+	# 	]))
+	# silence_intersects = [
+	# 	(max([start for start, _ in intersection]), min([end for _, end in intersection]))
+	# 		for intersection in silence_segments
+	# ] ## use for spliting
+	sensors_map = {
+		'rng': {
+			'_index': 0
+		},
+		'idx': {
+			'_index': 1
+		},
+		'tmb': {
+			'_index': 2
+		},
+		'mdl': {
+			'_index': 3
+		},
+		'pnk': {
+			'_index': 4
+		},
+		'ref': {
+			'_index': 5
+		}
+	}

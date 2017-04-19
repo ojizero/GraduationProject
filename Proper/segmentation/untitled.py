@@ -1,3 +1,20 @@
+[0:5]
+smooth = 10
+cons   = 5
+thresh = 75
+inc    = 1.001
+dec    = 0.999
+
+=======
+
+for i in range(6):
+	plt.figure(i)
+	plt.plot(splicers[i].smooth_intensities(splicers[i].measure_intensity(splicers[i].data_stream), 10))
+	[plt.axvline(x=j, color='k', linestyle="--") for t in slices[i] for j in t]
+
+
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 from math import sqrt
@@ -42,7 +59,7 @@ def splice_data (data, silence_segments):
 	return [data[start:end,:] for start, end in segments]
 
 
-data = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/echoed', delimiter=',')
+data = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/Proper/alef.ba.alef.ba', delimiter=',')
 both = intensity_calculator(data)
 gyro = smooth_intensities(intensity_calculator(data, accl_ratio=0), 50)
 silence = silence_segments(gyro)

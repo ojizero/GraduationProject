@@ -173,6 +173,9 @@ class AHRS:
 		self.q2 *= recipNorm
 		self.q3 *= recipNorm
 
+		# returns (W,X,Y,Z)
+		return (self.q0, self.q1, self.q2, self.q3)
+
 	def setGyroOffset (self, offsetX, offsetY, offsetZ):
 		self.gyroOffset[0] = offsetX
 		self.gyroOffset[1] = offsetY

@@ -54,7 +54,7 @@ class Extractor:
 	# 	pass
 
 	def _power_spectum_density_feature (self, data_windowed):
-		return self._dft_feature(data_windowed) ** 2
+		return self._dft_feature(data_windowed) ** 2 ## odd ??
 
 	def _dc_component_feature (self, data_windowed):
 		return self._power_spectum_density_feature(data_windowed)[0]
