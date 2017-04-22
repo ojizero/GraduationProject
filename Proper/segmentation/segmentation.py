@@ -154,21 +154,27 @@ if __name__ == '__main__':
 	# ] ## use for spliting
 	sensors_map = {
 		'rng': {
-			'_index': 0
+			'_index'    : 0,
+			'_mux_index': 2
 		},
 		'idx': {
-			'_index': 1
+			'_index'    : 1,
+			'_mux_index': 3
 		},
 		'tmb': {
-			'_index': 2
+			'_index'    : 2,
+			'_mux_index': 4
 		},
 		'mdl': {
-			'_index': 3
+			'_index'    : 3,
+			'_mux_index': 5
 		},
 		'pnk': {
-			'_index': 4
+			'_index'    : 4,
+			'_mux_index': 6
 		},
 		'ref': {
-			'_index': 5
+			'_index'    : 5,
+			'_mux_index': 7
 		}
 	}
