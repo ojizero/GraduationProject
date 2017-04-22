@@ -131,8 +131,16 @@ void setup()
   while (!Serial.available())
     ;
 
+  int r, f=0;
   // The loop outside The Loop
   while (1) {
+    if ((r = Serial.read()) >= 0) {
+      if (r == 's') f = 1;
+      if (r == 'r') f = 0;
+    }
+
+    if (f) continue;
+
     for (int i=2; i<=7; i++) {
       tcaselect(i);
       Serial.print( (i!=2)?(", "):("") );
