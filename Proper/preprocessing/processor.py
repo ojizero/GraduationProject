@@ -1,6 +1,6 @@
 from math import asin, atan2, atan2, pi, sqrt
 
-class AHRS:
+class Processor:
 	"""AHRS.cpp Python edition"""
 	def __init__(self, q0=1, q1=0, q2=0, q3=0):
 		self.q0 = q0
@@ -107,6 +107,9 @@ class AHRS:
 		self.q1 *= recipNorm
 		self.q2 *= recipNorm
 		self.q3 *= recipNorm
+
+		return (self.q0, self.q1, self.q2, self.q3)
+
 
 	def updateIMU (self, ax, ay, az, gx, gy, gz, dt):
 		recipNorm = \
