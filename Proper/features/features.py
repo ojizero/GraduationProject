@@ -37,10 +37,10 @@ class Extractor:
 			window_size = Extractor._WINDOW_SIZE
 
 		# window the data
-		data_windowed = np.array([data[:,pivot-window_size//2:pivot+window_size//2,...] for pivot in range(window_size//2,len(data)-window_size//2)])
+		data_windowed = np.array([data[:,pivot-window_size//2:pivot+window_size//2,...] for pivot in range(window_size//2, data.shape[1]-window_size//2, window_size)])
 
 		# returns an R -> R[sensor][window][reading]['feature_method_name']
-		return [Extractor._extract_features(data_windowed[...,col]) for col in range(data_windowed.shape[-1])]
+		return np.array([Extractor._extract_features(data_windowed[...,col]) for col in range(data_windowed.shape[-1])])
 
 	@classinstancemethod
 	def _extract_features (obj, data_column):
@@ -51,60 +51,91 @@ class Extractor:
 			obj = 'self'
 
 		# perform each method ending with '_feature' from given class or instance on given data
-		return {feature: eval('%s.%s' % (obj, feature))(data_column) for feature in dir(obj) if feature.endswith('_feature')}
+		return {feature: eval('%s.%s' % (obj, feature))(data_column) for feature in dir(eval(obj)) if feature.endswith('_feature')}
 
 	## Features to be used
 
 	@staticmethod
-	def _autocorrelate_feature (data_windowed):
+	def _autocorrelate_feature (data_streams):
 		return np.array(np.nan_to_num([
-			np.correlate(data_window, data_window, mode='full') for data_window in data_windowed
+			[np.correlate(window, window, mode='full') for window in stream]
+				for stream in data_streams
 		]))
 
 	@staticmethod
-	def _mean_feature (data_windowed):
-		return np.array(np.nan_to_num([np.average(data_window) for data_window in data_windowed]))
+	def _mean_feature (data_streams):
+		return np.array(np.nan_to_num([
+			[np.average(window) for window in stream]
+				for stream in data_streams
+		]))
 
 	@staticmethod
-	def _variance_feature (data_windowed):
-		return np.array(np.nan_to_num([np.var(data_window) for data_window in data_windowed]))
+	def _variance_feature (data_streams):
+		return np.array(np.nan_to_num([
+			[np.var(window) for window in stream]
+				for stream in data_streams
+		]))
 
 	@staticmethod
-	def _skewness_feature (data_windowed):
-		return np.array(np.nan_to_num([st.skew(data_window) for data_window in data_windowed]))
+	def _skewness_feature (data_streams):
+		return np.array(np.nan_to_num([
+			[st.skew(window) for window in stream]
+				for stream in data_streams
+		]))
 
 	@staticmethod
-	def _kurtoises_feature (data_windowed):
-		return np.array(np.nan_to_num([st.kurtosis(data_window) for data_window in data_windowed]))
+	def _kurtoises_feature (data_streams):
+		return np.array(np.nan_to_num([
+			[st.kurtosis(window) for window in stream]
+				for stream in data_streams
+		]))
 
 	@staticmethod
-	def _dft_feature (data_windowed):
-		return np.array(np.nan_to_num([np.fft(data_window) for data_window in data_windowed]))
+	def _dft_feature (data_streams):
+		return np.array(np.nan_to_num([
+			[np.fft.fft(window) for window in stream]
+				for stream in data_streams
+		]))
 
 	@staticmethod
-	def _entropy_feature (data_windowed):
-		return np.array(np.nan_to_num([st.entropy(data_window) for data_window in data_windowed]))
+	def _entropy_feature (data_streams):
+		return np.array(np.nan_to_num([
+			[st.entropy(window) for window in stream]
+				for stream in data_streams
+		]))
 
 	# # highly dependant on fourier
 	# def _power_spectum_density_feature (self, data_windowed):
 	# 	return self._dft_feature(data_windowed) ** 2 ## odd ??
 
 	@staticmethod
-	def _dc_component_feature (data_windowed):
-		return Extractor._dft_feature(data_windowed)[0]
+	def _dc_component_feature (data_streams):
+		return np.array(np.nan_to_num([
+			[window_dft[0] for window_dft in stream]
+				for stream in Extractor._dft_feature(data_streams)
+		]))
 
 	@staticmethod
-	def _signal_magnitude_area_feature (data_windowed):
-		return [sum(np.absolute(data_window)) for data_window in data_windowed]
+	def _signal_magnitude_area_feature (data_streams):
+		return np.array(np.nan_to_num([
+			[sum(np.absolute(window)) for window in stream]
+				for stream in data_streams
+		]))
 
 	@staticmethod
-	def _integration_feature (data_windowed):
+	def _integration_feature (data_streams):
 		# integration := np.trapz
-		return np.trapz(data_windowed)
+		return np.array(np.nan_to_num([
+			[np.trapz(window) for window in stream]
+				for stream in data_streams
+		]))
 
 	@staticmethod
-	def _rms_feature (data_windowed):
-		return [np.sqrt(sum(data_window ** 2))/(len(data_window)) for data_window in data_windowed]
+	def _rms_feature (data_streams):
+		return np.array(np.nan_to_num([
+			[np.sqrt(sum(window**2))/(len(window)) for window in stream]
+				for stream in data_streams
+		]))
 
 
 if __name__ == '__main__':
