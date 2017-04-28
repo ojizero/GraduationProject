@@ -39,7 +39,7 @@ class Extractor:
 		# window the data
 		data_windowed = np.array([data[:,pivot-window_size//2:pivot+window_size//2,...] for pivot in range(window_size//2, data.shape[1]-window_size//2, window_size)])
 
-		# returns an R -> R[sensor][window][reading]['feature_method_name']
+		# returns R -> R[sensor][window][reading]['feature_method_name']
 		return np.array([Extractor._extract_features(data_windowed[...,col]) for col in range(data_windowed.shape[-1])])
 
 	@classinstancemethod
@@ -98,7 +98,7 @@ class Extractor:
 	@staticmethod
 	def dc_component_feature (data_streams):
 		_feature = lambda dft: dft[0]
-		return Extractor._generic_feature_applier(Extractor._dft_feature(data_streams), _feature)
+		return Extractor._generic_feature_applier(Extractor.dft_feature(data_streams), _feature)
 
 	@staticmethod
 	def signal_magnitude_area_feature (data_streams):
