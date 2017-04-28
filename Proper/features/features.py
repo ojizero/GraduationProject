@@ -63,55 +63,55 @@ class Extractor:
 	## Features to be used
 
 	@staticmethod
-	def _autocorrelate_feature (data_streams):
+	def autocorrelate_feature (data_streams):
 		_feature = lambda w: np.correlate(w, w, mode='full')
 		return Extractor._generic_feature_applier(data_streams, _feature)
 
 	@staticmethod
-	def _mean_feature (data_streams):
+	def mean_feature (data_streams):
 		return Extractor._generic_feature_applier(data_streams, np.average)
 
 	@staticmethod
-	def _variance_feature (data_streams):
+	def variance_feature (data_streams):
 		return Extractor._generic_feature_applier(data_streams, np.var)
 
 	@staticmethod
-	def _skewness_feature (data_streams):
+	def skewness_feature (data_streams):
 		return Extractor._generic_feature_applier(data_streams, st.skew)
 
 	@staticmethod
-	def _kurtoises_feature (data_streams):
+	def kurtoises_feature (data_streams):
 		return Extractor._generic_feature_applier(data_streams, st.kurtosis)
 
 	@staticmethod
-	def _dft_feature (data_streams):
+	def dft_feature (data_streams):
 		return Extractor._generic_feature_applier(data_streams, np.fft.fft)
 
 	@staticmethod
-	def _entropy_feature (data_streams):
+	def entropy_feature (data_streams):
 		return Extractor._generic_feature_applier(data_streams, st.entropy)
 
 	# # highly dependant on fourier
-	# def _power_spectum_density_feature (self, data_windowed):
+	# def power_spectum_density_feature (self, data_windowed):
 	# 	return self._dft_feature(data_windowed) ** 2 ## odd ??
 
 	@staticmethod
-	def _dc_component_feature (data_streams):
+	def dc_component_feature (data_streams):
 		_feature = lambda dft: dft[0]
 		return Extractor._generic_feature_applier(Extractor._dft_feature(data_streams), _feature)
 
 	@staticmethod
-	def _signal_magnitude_area_feature (data_streams):
+	def signal_magnitude_area_feature (data_streams):
 		_feature = lambda w: sum(np.absolute(w))
 		return Extractor._generic_feature_applier(data_streams, _feature)
 
 	@staticmethod
-	def _integration_feature (data_streams):
+	def integration_feature (data_streams):
 		# integration := np.trapz
 		return Extractor._generic_feature_applier(data_streams, np.trapz)
 
 	@staticmethod
-	def _rms_feature (data_streams):
+	def rms_feature (data_streams):
 		_feature = lambda w: np.sqrt(sum(w**2))/len(w)
 		return Extractor._generic_feature_applier(data_streams, _feature)
 
