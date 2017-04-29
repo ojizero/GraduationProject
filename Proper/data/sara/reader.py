@@ -31,7 +31,7 @@ if __name__ == '__main__':
 	readings_count = int(argv[2])
 
 	# serial_port = get_feather_ports()[0][0]
-	serial_port = get_ports('Arduino')[0][0]
+	serial_port = get_ports()[0][0]
 	s = serial.Serial(serial_port, 115200)
 
 	if not os.path.exists('./%s' % letter):
