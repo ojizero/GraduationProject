@@ -1,3 +1,4 @@
+import serial
 import serial.tools.list_ports
 import platform
 
@@ -46,6 +47,9 @@ if __name__ == '__main__':
 				except KeyboardInterrupt:
 					s.write(b's')
 					break
+				except serial.SerialException:
+					print('serial error !! but still continuing #stubborn')
+					pass
 				except Exception as e:
 					print('-=-=-=-=-=-= errored =-=-=-=-=-=-', e)
 					exit(1)
