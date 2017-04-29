@@ -10,14 +10,6 @@ def get_ports (name='generic'):
 
 	return serial_ports
 
-# def get_ports():
-# 	# Not sure how OSX displays the name of the UNO port
-# 	device_name = {'Darwin': 'arduino', 'Linux': 'ACM'}
-# 	serial_ports = [port for port in serial.tools.list_ports.comports() if device_name[platform.system()] in port[1].lower()]
-# 	if len(serial_ports) == 0:
-# 		raise EnvironmentError('Couldn\'t find any ports')
-# 	return serial_ports
-
 if __name__ == '__main__':
 	import os
 	import serial
