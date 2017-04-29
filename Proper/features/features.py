@@ -29,18 +29,29 @@ class classinstancemethod:
 class Extractor:
 	_WINDOW_SIZE = 10
 
-	@staticmethod
-	def extract (data, window_size=None, multi=True):
+	@classinstancemethod
+	def extract (obj, data, window_size=None, multi=True):
+		if isinstance(obj, type):
+			obj = obj.__name__
+		else:
+			obj = 'obj'
+
 		if not multi:
 			data = np.array([data])
 		if window_size is None:
 			window_size = Extractor._WINDOW_SIZE
 
 		# window the data
-		data_windowed = np.array([data[:,pivot-window_size//2:pivot+window_size//2,...] for pivot in range(window_size//2, data.shape[1]-window_size//2, window_size)])
+		data_windowed = np.array([
+			data[:,pivot-window_size//2:pivot+window_size//2,...]
+				for pivot in range(window_size//2, data.shape[1]-window_size//2, window_size)
+		])
 
 		# returns R -> R[sensor][window][reading]['feature_method_name']
-		return np.array([Extractor._extract_features(data_windowed[...,col]) for col in range(data_windowed.shape[-1])])
+		return np.array([
+			eval(obj)._extract_features(data_windowed[...,col])
+				for col in range(data_windowed.shape[-1])
+		])
 
 	@classinstancemethod
 	def _extract_features (obj, data_column):
