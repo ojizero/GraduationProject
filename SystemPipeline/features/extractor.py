@@ -4,28 +4,26 @@ sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 
 
 import numpy as np
-import scipy.stats as st
 
 from utils.decorators import classinstancemethod
 
+
 class Extractor:
+	_EXTRACT_ON  = '_feature'
 	_WINDOW_SIZE = 10
 
 	@classinstancemethod
-	def extract (obj, data, **kwargs):
-		## introspection manipulation
-		if isinstance(obj, type):
-			obj = obj.__name__
-		else:
-			obj = 'obj'
+	def extract (obj, **kwargs):
+		assert kwargs.get('data', []) != [], '`data` is a required parameter'
+		data = kwargs['data']
 
 		## parameters and their default values
 		if not kwargs.get('multi', True):
 			data = np.array([data])
 
-		window_size = kwargs.get('window_size', eval(obj)._WINDOW_SIZE)
+		window_size = kwargs.get('window_size', obj._WINDOW_SIZE)
 
-		overlap = kwargs('overlap', 0.0)
+		overlap = kwargs.get('overlap', 0.0)
 		assert 0.0 <= overlap < 1
 
 		## method logic
@@ -38,23 +36,17 @@ class Extractor:
 
 		readings = data_windowed.shape[-1]
 		# returns R -> R[sensor][window][reading]['feature_method_name']
-		return np.array([eval(obj)._extract_features(data_windowed[...,col]) for col in range(readings)])
+		return np.array([obj._extract(data_windowed[...,col], **kwargs) for col in range(readings)])
 
 	@classinstancemethod
-	def _extract_features (obj, data_column):
-		# this condition is used to manipulate the introspective part when calculating features
-		if isinstance(obj, type):
-			obj = obj.__name__
-		else:
-			obj = 'obj'
-
-		# perform each method ending with '_feature' from given class or instance on given data
-		return {feature: eval('%s.%s' % (obj, feature))(data_column) for feature in dir(eval(obj)) if feature.endswith('_feature')}
+	def _extract (obj, data_column, **kwargs):
+		extract_on = kwargs.get('extract_on', obj._EXTRACT_ON)
+		# perform each method ending with `extract_on` from given class or instance on given data
+		return {name: function.__func__(data_column) for name, function in obj.__dict__.items() if name.endswith(extract_on)}
 
 	@staticmethod
-	def _generic_feature_applier (data_streams, feature_function):
+	def _generic_loop (data_streams, feature_function):
 		return np.array(np.nan_to_num([
 			[feature_function(window) for window in stream]
 				for stream in data_streams
 		]))
-
