@@ -3,57 +3,10 @@ import sys
 sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 
 
-import numpy as np
-import scipy.stats as st
+from features.extractor import Extractor
 
-from utils.decorators import classinstancemethod
 
-class Extractor:
-	_WINDOW_SIZE = 10
-
-	@classinstancemethod
-	def extract (obj, data, window_size=None, overlap=0.0, multi=True):
-		if isinstance(obj, type):
-			obj = obj.__name__
-		else:
-			obj = 'obj'
-
-		if not multi:
-			data = np.array([data])
-		if window_size is None:
-			window_size = Extractor._WINDOW_SIZE
-		assert 0.0 <= overlap < 1
-
-		begin = border = window_size // 2
-		step  = window_size - round(overlap * window_size)
-		end   = data.shape[1] - window_size // 2
-		# window the data
-		data_windowed = np.array([data[:,pivot-border:pivot+border,...] for pivot in range(begin, end, step)])
-
-		readings = data_windowed.shape[-1]
-		# returns R -> R[sensor][window][reading]['feature_method_name']
-		return np.array([eval(obj)._extract_features(data_windowed[...,col]) for col in range(readings)])
-
-	@classinstancemethod
-	def _extract_features (obj, data_column):
-		# this condition is used to manipulate the introspective part when calculating features
-		if isinstance(obj, type):
-			obj = obj.__name__
-		else:
-			obj = 'obj'
-
-		# perform each method ending with '_feature' from given class or instance on given data
-		return {feature: eval('%s.%s' % (obj, feature))(data_column) for feature in dir(eval(obj)) if feature.endswith('_feature')}
-
-	@staticmethod
-	def _generic_feature_applier (data_streams, feature_function):
-		return np.array(np.nan_to_num([
-			[feature_function(window) for window in stream]
-				for stream in data_streams
-		]))
-
-	## Features to be used
-
+class FeaturesExtractor (Extractor):
 	@staticmethod
 	def autocorrelate_feature (data_streams):
 		_feature = lambda w: np.correlate(w, w, mode='full')
@@ -83,10 +36,6 @@ class Extractor:
 	def entropy_feature (data_streams):
 		return Extractor._generic_feature_applier(data_streams, st.entropy)
 
-	# # highly dependant on fourier
-	# def power_spectum_density_feature (self, data_windowed):
-	# 	return self._dft_feature(data_windowed) ** 2 ## odd ??
-
 	@staticmethod
 	def dc_component_feature (data_streams):
 		_feature = lambda dft: dft[0]
@@ -112,7 +61,7 @@ if __name__ == '__main__':
 	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/7a/ha.4_22_14_50_54.csv', delimiter=',')
 	data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
-	featured = Extractor.extract(data_streams)
+	featured = FeaturesExtractor.extract(data_streams)
 
 	with open('features_dump', 'w') as f:
 		f.write(str(featured))
