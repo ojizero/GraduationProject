@@ -1,30 +1,12 @@
+import sys
+# Add project to path, to be able to import modules from it
+sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
+
+
 import numpy as np
 import scipy.stats as st
 
-## TODO move later to some other place in project
-import functools
-class classinstancemethod:
-	'''
-	A describtor for having a method that is both a class method and an instance method
-
-	Courtesy of: Mike Axiak, from StackOverflow, cheers and thanks for saving us time and effort !
-	https://stackoverflow.com/questions/2589690/creating-a-method-that-is-simultaneously-an-instance-and-class-method
-	'''
-	def __init__(self, method):
-		self.method = method
-
-	def __get__(self, obj=None, typ=None):
-		@functools.wraps(self.method)
-		def _wrapper(*args, **kwargs):
-			if obj is not None:
-				# as instance method
-				return self.method(obj, *args, **kwargs)
-			else:
-				# as class method
-				return self.method(typ, *args, **kwargs)
-
-		return _wrapper
-
+from utils.decorators import classinstancemethod
 
 class Extractor:
 	_WINDOW_SIZE = 10
@@ -127,7 +109,7 @@ class Extractor:
 
 
 if __name__ == '__main__':
-	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/Proper/data/ameer/7a/ha.4_22_14_50_54.csv', delimiter=',')
+	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/7a/ha.4_22_14_50_54.csv', delimiter=',')
 	data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
 	featured = Extractor.extract(data_streams)
