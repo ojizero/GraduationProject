@@ -61,7 +61,7 @@ if __name__ == '__main__':
 	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/7a/ha.4_22_14_50_54.csv', delimiter=',')
 	data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
-	featured = FeaturesExtractor.extract(data_streams)
+	features = FeaturesExtractor.extract(data_streams)
 
 	with open('features_dump', 'w') as f:
-		f.write(str(featured))
+		f.write(str(features))
