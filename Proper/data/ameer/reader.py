@@ -34,6 +34,7 @@ if __name__ == '__main__':
 		c = datetime.datetime.now()
 		c = '%s_%s_%s_%s_%s' % (c.month, c.day, c.hour, c.minute, c.second)
 		input('\n\ncharacter ')
+		callback = lambda : None
 		s.write(b'r')
 		with open('./%s/%s.%s.csv' % (letter, letter, c), 'wb') as f:
 			while True:
@@ -52,4 +53,7 @@ if __name__ == '__main__':
 					pass
 				except Exception as e:
 					print('-=-=-=-=-=-= errored =-=-=-=-=-=-', e)
+					# callback = exit(1)
+					s.write(b's')
 					exit(1)
+					# callback()
