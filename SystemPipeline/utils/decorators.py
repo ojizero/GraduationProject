@@ -23,20 +23,34 @@ class classinstancemethod:
 
 		return _wrapper
 
-class reorderparams:
+# preserve original staticmethod
+staticmethod_ = staticmethod
+
+# extend staticmethod, implementing the `__call__` function
+class staticmethod (staticmethod_):
 	'''
-	reorders paramers, specially for instance methods
-	can help make static and instance method call identical
+		Custom staticmethod class adding `__call__` method
+		used to unify calling staticmethods and instancemethods
+		within the Extractor class using simply the `__call__` function
+	'''
+	def __call__ (self_, *args, **kwargs):
+		return self_.__func__(*args, **kwargs)
+
+
+class instancemethod:
+	'''
+		Implementing __func__ method on instance methods
 	'''
 	def __init__ (self, method):
 		self.method = method
 
 	def __get__ (self, obj=None, typ=None):
 		@functools.wraps(self.method)
-		def _wrapper (*args, **kwargs):
-			kwargs['typ']  = typ
-			kwargs['self'] = obj
+		def _method (*args, **kwargs):
+			return self.method(obj, *args, **kwargs)
 
-			return self.method(*args, **kwargs)
+		return _method
 
-		return _wrapper
+	def __func__ (self_, *args, **kwargs):
+		self_.method(*args, **kwargs)
+

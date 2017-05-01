@@ -6,60 +6,67 @@ sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 import numpy as np
 import scipy.stats as st
 from features.extractor import Extractor
-
+from utils.decorators import staticmethod
 
 class FeaturesExtractor (Extractor):
 	@staticmethod
-	def autocorrelate_feature (**kwargs):
+	def autocorrelate_feature (data_column, **kwargs):
 		_feature = lambda w: np.correlate(w, w, mode='full')
-		return FeaturesExtractor._generic_loop(kwargs['data_streams'], _feature)
+		return FeaturesExtractor._generic_loop(data_column, _feature)
 
 	@staticmethod
-	def mean_feature (**kwargs):
-		return FeaturesExtractor._generic_loop(kwargs['data_streams'], np.average)
+	def mean_feature (data_column, **kwargs):
+		return FeaturesExtractor._generic_loop(data_column, np.average)
 
 	@staticmethod
-	def variance_feature (**kwargs):
-		return FeaturesExtractor._generic_loop(kwargs['data_streams'], np.var)
+	def variance_feature (data_column, **kwargs):
+		return FeaturesExtractor._generic_loop(data_column, np.var)
 
 	@staticmethod
-	def skewness_feature (**kwargs):
-		return FeaturesExtractor._generic_loop(kwargs['data_streams'], st.skew)
+	def skewness_feature (data_column, **kwargs):
+		return FeaturesExtractor._generic_loop(data_column, st.skew)
 
 	@staticmethod
-	def kurtoises_feature (**kwargs):
-		return FeaturesExtractor._generic_loop(kwargs['data_streams'], st.kurtosis)
+	def kurtoises_feature (data_column, **kwargs):
+		return FeaturesExtractor._generic_loop(data_column, st.kurtosis)
 
 	@staticmethod
-	def dft_feature (**kwargs):
-		return FeaturesExtractor._generic_loop(kwargs['data_streams'], np.fft.fft)
+	def dft_feature (data_column, **kwargs):
+		return FeaturesExtractor._generic_loop(data_column, np.fft.fft)
 
 	@staticmethod
-	def entropy_feature (**kwargs):
-		return FeaturesExtractor._generic_loop(kwargs['data_streams'], st.entropy)
+	def entropy_feature (data_column, **kwargs):
+		return FeaturesExtractor._generic_loop(data_column, st.entropy)
 
 	@staticmethod
-	def dc_component_feature (**kwargs):
+	def dc_component_feature (data_column, **kwargs):
 		_feature = lambda dft: dft[0]
-		return FeaturesExtractor._generic_loop(FeaturesExtractor.dft_feature(data_streams), _feature)
+		return FeaturesExtractor._generic_loop(FeaturesExtractor.dft_feature(data_column), _feature)
 
 	@staticmethod
-	def signal_magnitude_area_feature (**kwargs):
+	def signal_magnitude_area_feature (data_column, **kwargs):
 		_feature = lambda w: sum(np.absolute(w))
-		return FeaturesExtractor._generic_loop(kwargs['data_streams'], _feature)
+		return FeaturesExtractor._generic_loop(data_column, _feature)
 
 	@staticmethod
-	def integration_feature (**kwargs):
+	def integration_feature (data_column, **kwargs):
 		# integration := np.trapz
-		return FeaturesExtractor._generic_loop(kwargs['data_streams'], np.trapz)
+		return FeaturesExtractor._generic_loop(data_column, np.trapz)
 
 	@staticmethod
-	def rms_feature (**kwargs):
+	def rms_feature (data_column, **kwargs):
 		_feature = lambda w: np.sqrt(sum(w**2))/len(w)
-		return FeaturesExtractor._generic_loop(kwargs['data_streams'], _feature)
+		return FeaturesExtractor._generic_loop(data_column, _feature)
+
+	# # # example of using instance method
+	# # # if custom staicmethod is used then no need for the instancemethod decorator
+	# # @instancemethod
+	# def instance_method_feature (self, **kwargs):
+	# 	return None
 
 
 if __name__ == '__main__':
+	pass
 	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/7a/ha.4_22_14_50_54.csv', delimiter=',')
 	data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 

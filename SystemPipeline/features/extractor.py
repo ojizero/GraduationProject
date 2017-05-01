@@ -41,9 +41,10 @@ class Extractor:
 	@classinstancemethod
 	def _extract (obj, data_column, **kwargs):
 		extract_on = kwargs.get('extract_on', obj._EXTRACT_ON)
+		kwargs['self']        = obj
 		kwargs['data_column'] = data_column
 		# perform each method ending with `extract_on` from given class or instance on given data
-		return {name: function.__func__(**kwargs) for name, function in obj.__dict__.items() if name.endswith(extract_on)}
+		return {name: function.__call__(**kwargs) for name, function in obj.__dict__.items() if name.endswith(extract_on)}
 		## add `**kwargs` as parameter to function call
 
 	@staticmethod
