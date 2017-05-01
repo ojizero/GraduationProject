@@ -22,3 +22,21 @@ class classinstancemethod:
 				return self.method(typ, *args, **kwargs)
 
 		return _wrapper
+
+class reorderparams:
+	'''
+	reorders paramers, specially for instance methods
+	can help make static and instance method call identical
+	'''
+	def __init__ (self, method):
+		self.method = method
+
+	def __get__ (self, obj=None, typ=None):
+		@functools.wraps(self.method)
+		def _wrapper (*args, **kwargs):
+			kwargs['typ']  = typ
+			kwargs['self'] = obj
+
+			return self.method(*args, **kwargs)
+
+		return _wrapper

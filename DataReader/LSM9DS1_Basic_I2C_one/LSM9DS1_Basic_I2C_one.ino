@@ -142,6 +142,10 @@ void setup()
     if (f) continue;
 
     for (int i=2; i<=7; i++) {
+//      Serial.print("reading from: ");
+//      Serial.print( i );
+//      Serial.print(" => ");
+      
       tcaselect(i);
       Serial.print( (i!=2)?(", "):("") );
 
@@ -151,6 +155,7 @@ void setup()
       printAccel(); // Print A: "ax, ay, az"
       printMag();   // Print M: "mx, my, mz"
 
+//      Serial.println();
       // Print the heading and orientation for fun!
       // Call print attitude. The LSM9DS1's magnetometer x and y
       // axes are opposite to the accelerometer, so my and mx are
