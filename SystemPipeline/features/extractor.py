@@ -4,12 +4,13 @@ sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 
 
 import numpy as np
+from re import match
 
 from utils.decorators import classinstancemethod
 
 
 class Extractor:
-	_EXTRACT_ON  = '_feature'
+	_EXTRACT_ON  = lambda string: match('.*_feature$', string)
 	_WINDOW_SIZE = 10
 
 	@classinstancemethod
@@ -44,7 +45,7 @@ class Extractor:
 		kwargs['self']        = obj
 		kwargs['data_column'] = data_column
 		# perform each method ending with `extract_on` from given class or instance on given data
-		return {name: function.__call__(**kwargs) for name, function in obj.__dict__.items() if name.endswith(extract_on)}
+		return {name: function.__call__(**kwargs) for name, function in obj.__dict__.items() if extract_on(name)}
 		## add `**kwargs` as parameter to function call
 
 	@staticmethod
