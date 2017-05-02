@@ -21,24 +21,21 @@ class FeaturesTransformer:
 	# label => [feature1_window1_stream1, feature1_window2_stream1, ..., featureN_windowN_streamN]
 
 	@classinstancemethod
+	def transform (obj, **kwargs):
+		pass
+
+	@classinstancemethod
 	def _transform (obj, **kwargs):
 		features = kwargs.get('features')
 		if features is None:
 			features = obj._extractor.extract(**kwargs)
 
-		result = []
-
-		for data_column, streams in features:
-			for s_index in range(len(streams)):
-				stream = streams[s_index]
-				for w_index in range(len(stream)):
-					window = stream[w_index]
-
-					feature_tuple = ('%s_stream%s_window%s' % (data_column, s_index, w_index), window)
-
-					result.append(feature_tuple)
-
-		return dict(result)
+		return {
+			'%s_stream%s_window%s' % (data_column, s_index, w_index): window
+				for w_index, window in enumerate(streams)
+					for s_index, stream in enumerate(streams)
+						for data_column, streams in features
+		}
 
 
 
