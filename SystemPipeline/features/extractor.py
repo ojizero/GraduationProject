@@ -45,7 +45,7 @@ class Extractor:
 		kwargs['self']        = obj
 		kwargs['data_column'] = data_column
 		# perform each method ending with `extract_on` from given class or instance on given data
-		return {name: function(**kwargs) for name, function in obj.__dict__.items() if extract_on(name)}
+		return {name: getattr(obj, name)(**kwargs) for name in dir(obj) if extract_on(name)}
 
 	@staticmethod
 	def _generic_loop (data_streams, feature_function):

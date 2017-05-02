@@ -3,10 +3,10 @@ import functools
 
 class classinstancemethod:
 	'''
-	A describtor for having a method that is both a class method and an instance method
+		A describtor for having a method that is both a class method and an instance method
 
-	Courtesy of: Mike Axiak, from StackOverflow, cheers and thanks for saving us time and effort !
-	https://stackoverflow.com/questions/2589690/creating-a-method-that-is-simultaneously-an-instance-and-class-method
+		Courtesy of: Mike Axiak, from StackOverflow, cheers and thanks for saving us time and effort !
+		https://stackoverflow.com/questions/2589690/creating-a-method-that-is-simultaneously-an-instance-and-class-method
 	'''
 	def __init__(self, method):
 		self.method = method
@@ -29,7 +29,7 @@ staticmethod_ = staticmethod
 # extend staticmethod, implementing the `__call__` function
 class staticmethod (staticmethod_):
 	'''
-		Custom staticmethod class adding `__call__` method
+		Custom staticmethod class implementing `__call__` method
 		used to unify calling staticmethods and instancemethods
 		within the Extractor class using simply the `__call__` function
 	'''
