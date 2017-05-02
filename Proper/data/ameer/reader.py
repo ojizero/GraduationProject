@@ -1,6 +1,6 @@
 import serial
 import serial.tools.list_ports
-import platform
+
 
 def get_ports (name='generic'):
 	# get all serial ports with device `name`
@@ -23,7 +23,6 @@ if __name__ == '__main__':
 	letter = argv[1]
 	readings_count = int(argv[2])
 
-	# serial_port = get_feather_ports()[0][0]
 	serial_port = get_ports()[0][0]
 	s = serial.Serial(serial_port, 115200)
 
@@ -53,7 +52,5 @@ if __name__ == '__main__':
 					pass
 				except Exception as e:
 					print('-=-=-=-=-=-= errored =-=-=-=-=-=-', e)
-					# callback = exit(1)
 					s.write(b's')
 					exit(1)
-					# callback()
