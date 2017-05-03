@@ -22,19 +22,25 @@ class FeaturesTransformer:
 
 	@classinstancemethod
 	def transform (obj, **kwargs):
-		pass
+		transformed_dict = obj._transform(**kwargs)
+
+		features, values = zip(*transformed_dict.items())
+
+		return features, values
 
 	@classinstancemethod
 	def _transform (obj, **kwargs):
-		features = kwargs.get('features')
-		if features is None:
-			features = obj._extractor.extract(**kwargs)
+		extracted_feature = kwargs.get('extracted_feature')
+		if extracted_feature is None:
+			extracted_feature = obj._extractor.extract(**kwargs)
 
+		# uses R -> R[column/reading]['feature_name'][sensor][window]
 		return {
-			'%s_stream%s_window%s' % (data_column, s_index, w_index): window
-				for w_index, window in enumerate(streams)
-					for s_index, stream in enumerate(streams)
-						for data_column, streams in features
+			'%s_stream%s_window%s' % (feature_name, s_index, w_index): feature_value
+				for reading_features in extracted_feature
+					for feature_name, feature_value in reading_features.items()
+						for s_index, stream in enumerate(feature_value)
+							for w_index, window in enumerate(feature_value)
 		}
 
 
@@ -43,4 +49,7 @@ if __name__ == '__main__':
 	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/7a/ha.4_22_14_50_54.csv', delimiter=',')
 	data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
-	FeaturesTransformer.transform(data=data_streams)
+	transformed = FeaturesTransformer.transform(data=data_streams)
+
+	with open('transformer_dump', 'w') as f:
+		f.write(str(transformed))

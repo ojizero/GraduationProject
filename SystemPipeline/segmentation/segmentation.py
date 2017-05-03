@@ -5,32 +5,8 @@ from math import sqrt
 def _euclidean_magnitude (data_point):
 	return sqrt(sum(map(lambda d: d**2, data_point)))
 
-## gyro data more relevant for segmentation ?
-# data = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/echoed', delimiter=',')
-# data_no_motion = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/echoed_no_motion', delimiter=',')
 
-# intensities = intensity_calculator(data)
-# gryo_only = intensity_calculator(data, accl_ratio=0.0)
-# accl_only = intensity_calculator(data, gyro_ratio=0.0)
-
-# intensities_no_motion = intensity_calculator(data_no_motion)
-# gryo_only_no_motion = intensity_calculator(data_no_motion, accl_ratio=0.0)
-# accl_only_no_motion = intensity_calculator(data_no_motion, gyro_ratio=0.0)
-
-# plt.figure(1)
-# plt.plot(intensities)
-# plt.plot(intensities_no_motion)
-
-# plt.figure(2)
-# plt.plot(gryo_only)
-# plt.plot(gryo_only_no_motion)
-
-# plt.figure(3)
-# plt.plot(accl_only)
-# plt.plot(accl_only_no_motion)
-
-# plt.show()
-
+# refactor
 class Splicer:
 	def __init__ (
 		self, data_stream=None, smoothing_window=10,
