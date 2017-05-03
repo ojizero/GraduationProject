@@ -17,6 +17,7 @@ if __name__ == '__main__':
 	import datetime
 	from sys import argv
 
+
 	if len(argv) < 3:
 		raise ValueError('missing script arguments')
 

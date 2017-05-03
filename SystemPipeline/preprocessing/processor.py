@@ -1,5 +1,6 @@
 from math import asin, atan2, atan2, pi, sqrt
 
+
 class Processor:
 	"""AHRS.cpp Python edition"""
 	def __init__(self, q0=1, q1=0, q2=0, q3=0):

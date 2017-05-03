@@ -3,10 +3,9 @@ import sys
 sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 
 
-import numpy as np
-
 from features.features_extractor import FeaturesExtractor
 from utils.decorators import classinstancemethod
+
 
 class FeaturesTransformer:
 	'''
@@ -38,8 +37,8 @@ class FeaturesTransformer:
 	def _transform (obj, **kwargs):
 		# uses R -> R[column/reading]['feature_name'][sensor][window]
 		return {
-			'%s_stream%s_window%s' % (feature_name, s_index, w_index): feature_value
-				for reading_features in kwargs['extracted_feature']
+			'%s_stream%s_%s_window%s' % (feature_name, r_index, s_index, w_index): feature_value
+				for r_index, reading_features in enumerate(kwargs['extracted_feature'])
 					for feature_name, feature_value in reading_features.items()
 						for s_index, stream in enumerate(feature_value)
 							for w_index, window in enumerate(feature_value)
@@ -48,6 +47,9 @@ class FeaturesTransformer:
 
 
 if __name__ == '__main__':
+	import numpy as np
+
+
 	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/7a/ha.4_22_14_50_54.csv', delimiter=',')
 	data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 

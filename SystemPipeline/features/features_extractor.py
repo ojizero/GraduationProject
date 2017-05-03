@@ -9,6 +9,7 @@ import scipy.stats as st
 from features.extractor import Extractor
 from utils.decorators import staticmethod
 
+
 class FeaturesExtractor (Extractor):
 	@staticmethod
 	def autocorrelate_feature (data_column, **kwargs):
