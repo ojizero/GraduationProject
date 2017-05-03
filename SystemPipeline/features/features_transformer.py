@@ -12,16 +12,22 @@ class FeaturesTransformer:
 	'''
 	produces a feature vector from the result of feature extraction
 	'''
-	_extractor = FeaturesExtractor
-
+	_extractor     = FeaturesExtractor
+	_windows_count = 5 # number of windows, -1 for letting extractor decide
 
 	def __init__ (self, *args, **kwargs):
 		self._extractor = kwargs.pop('extractor', FeaturesTransformer._extractor)
 
-	# label => [feature1_window1_stream1, feature1_window2_stream1, ..., featureN_windowN_streamN]
-
 	@classinstancemethod
 	def transform (obj, **kwargs):
+		extracted_feature = kwargs.get('extracted_feature', None)
+		if extracted_feature is None:
+			windows_count = kwargs.get('windows_count', obj._windows_count)
+			if windows_count > 0:
+				kwargs['window_size'] = kwargs['data'].shape[1] // windows_count
+
+			kwargs['extracted_feature'] = obj._extractor.extract(**kwargs)
+
 		transformed_dict = obj._transform(**kwargs)
 
 		features, values = zip(*transformed_dict.items())
@@ -30,14 +36,10 @@ class FeaturesTransformer:
 
 	@classinstancemethod
 	def _transform (obj, **kwargs):
-		extracted_feature = kwargs.get('extracted_feature')
-		if extracted_feature is None:
-			extracted_feature = obj._extractor.extract(**kwargs)
-
 		# uses R -> R[column/reading]['feature_name'][sensor][window]
 		return {
 			'%s_stream%s_window%s' % (feature_name, s_index, w_index): feature_value
-				for reading_features in extracted_feature
+				for reading_features in kwargs['extracted_feature']
 					for feature_name, feature_value in reading_features.items()
 						for s_index, stream in enumerate(feature_value)
 							for w_index, window in enumerate(feature_value)
