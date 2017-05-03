@@ -1,0 +1,14 @@
+# ${var%%.*} <- to remove all by first before . in var
+
+## unified all data and trimmed first and last lines
+dr=(*)
+for d in $(echo ${dr}); do
+	if [[ $d != 'reader.py' ]] && [[ $d != 'shosmo' ]]; then
+		for l in $(\ls $d); do
+			for r in $(\ls $d/$l); do
+				mkdir "unified/$l"
+				head -n-1 < "$d/$l/$r" | tail -n+2 > "unified/$l/$r"
+			done
+		done
+	fi
+done
