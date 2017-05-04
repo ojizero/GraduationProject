@@ -24,8 +24,7 @@ class DatasetHandler:
 	@classmethod
 	def from_directory_csv (cls, **kwargs):
 		path = kwargs.pop('path', os.getcwd())
-		print(path)
-		return cls(csv_data=iglob('%s/**/*.csv' % path))
+		return cls(csv_data=iglob('%s/**/**/*.csv' % path))
 
 	def __iter__ (self):
 		return self
@@ -35,15 +34,19 @@ class DatasetHandler:
 			next_file = self.files_iterator.__next__()
 			label     = next_file[:next_file.find('.')]
 
+			# print(next_file, end=' --- ')
+
 			data_whole   = np.genfromtxt(next_file, delimiter=',')
 			data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
 			features_names, feature_vector = self.vector_maker(data=data_streams, **self.opts)
 
+			print(len(features_names))
 			if self.vector_names is ():
 				self.vector_names = features_names
 			elif self.vector_names != features_names:
 				raise Exception('features labels do not match')
+				# print('features labels do not match')
 
 			return label, feature_vector
 		except StopIteration as stop:
@@ -54,24 +57,27 @@ class DatasetHandler:
 	# def next (self):
 	# 	return self.__next__()
 
+	# refactor !
 	def store_csv (self, **kwargs):
 		# , os.getcwd()
+		header = ('label',) + self.vector_names
 		with open(kwargs.pop('csv_out'), 'w') as out:
-			header = ('label',) + self.vector_names
+			# print(header)
 			out.write(', '.join(header))
 			out.write('\n')
 
 			for label, vector in self:
-				data = ', '.join(vector)
-				row  = ', '.join((label, vector))
+				pass
+				# data = ', '.join([str(v).replace(',', ' ').replace('[', ' ').replace(']', ' ') for v in vector])
+				# row  = ', '.join((label, data)).replace('\n', ' ')
 
-				out.write(row)
-				out.write('\n')
+				# out.write(row)
+				# out.write('\n')
 
 		return self
 
 
 if __name__ == '__main__':
-	DatasetHandler \
-		.from_directory_csv(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/unified') \
-		.store_csv(csv_out='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset_dump.csv')
+	dataset = DatasetHandler.from_directory_csv(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data')
+
+	dataset.store_csv(csv_out='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset_dump.csv')

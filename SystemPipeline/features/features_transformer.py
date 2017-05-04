@@ -33,15 +33,15 @@ class FeaturesTransformer:
 
 		return features, values
 
-	@classinstancemethod
-	def _transform (obj, **kwargs):
+	@staticmethod
+	def _transform (**kwargs):
 		# uses R -> R[column/reading]['feature_name'][sensor][window]
 		return {
-			'%s_stream%s_%s_window%s' % (feature_name, r_index, s_index, w_index): feature_value
+			'%s_reading%s_stream%s_window%s' % (feature_name, r_index, s_index, w_index): feature_value
 				for r_index, reading_features in enumerate(kwargs['extracted_feature'])
 					for feature_name, feature_value in reading_features.items()
 						for s_index, stream in enumerate(feature_value)
-							for w_index, window in enumerate(feature_value)
+							for w_index, window in enumerate(stream)
 		}
 
 

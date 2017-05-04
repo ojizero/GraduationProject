@@ -60,12 +60,6 @@ class FeaturesExtractor (Extractor):
 		_feature = lambda w: np.sqrt(sum(w**2))/len(w)
 		return FeaturesExtractor._generic_loop(data_column, _feature)
 
-	# # # example of using instance method
-	# # # if custom staicmethod is used then no need for the instancemethod decorator
-	# # @instancemethod
-	# def instance_method_feature (self, **kwargs):
-	# 	return None
-
 
 if __name__ == '__main__':
 	pass
