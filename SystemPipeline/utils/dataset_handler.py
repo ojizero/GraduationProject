@@ -4,6 +4,7 @@ sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 
 
 import os
+import re
 import numpy as np
 from glob import iglob
 
@@ -11,11 +12,17 @@ from features.features_transformer import FeaturesTransformer
 from utils.decorators import classinstancemethod
 
 
+_path_label_pattern = '^.*\/(\w*)(?:\.\w+)?\/.*\.csv$'
+_rgx = re.compile(_path_label_pattern)
+
+
 class DatasetHandler:
+	_LABEL_MAKER = lambda path: _rgx.search(path).groups()[0]
 	_FEATURE_VECTOR_MAKER = FeaturesTransformer.transform
 
 	def __init__ (self, **kwargs):
 		self.vector_maker   = kwargs.pop('vector_maker', DatasetHandler._FEATURE_VECTOR_MAKER)
+		self.label_maker    = kwargs.pop('label_maker', DatasetHandler._LABEL_MAKER)
 		self.files_iterator = kwargs.pop('csv_data')
 		self._vector_names  = ()
 
@@ -24,7 +31,7 @@ class DatasetHandler:
 
 	@classmethod
 	def from_csv_directory (cls, path):
-		return cls(csv_data=iglob('%s/**/**/*.csv' % path), path=path)
+		return cls(csv_data=iglob('%s/*.csv' % path), path=path)
 
 	@classmethod
 	def from_csv_file (cls, **kwargs):
@@ -38,14 +45,13 @@ class DatasetHandler:
 	def __next__ (self):
 		# try:
 		next_file = self.files_iterator.__next__()
-		label     = next_file[:next_file.find('.')] # fix had
+		label     = self.label_maker(next_file)
 
 		data_whole   = np.genfromtxt(next_file, delimiter=',')
 		data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
 		features_names, feature_vector = self.vector_maker(data=data_streams, **self.opts)
 
-		print (next_file)
 		if self._vector_names is ():
 			self._vector_names = features_names
 		elif self._vector_names != features_names:
@@ -81,6 +87,6 @@ class DatasetHandler:
 			out.write(out_str)
 
 if __name__ == '__main__':
-	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data')
+	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/6a')
 
 	dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset_dump.csv')

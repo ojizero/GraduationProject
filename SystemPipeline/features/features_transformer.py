@@ -19,15 +19,15 @@ class FeaturesTransformer:
 
 	@classinstancemethod
 	def transform (obj, **kwargs):
-		extracted_feature = kwargs.get('extracted_feature', None)
+		extracted_feature = kwargs.pop('extracted_feature', None)
 		if extracted_feature is None:
-			windows_count = kwargs.get('windows_count', obj._windows_count)
+			windows_count = kwargs.pop('windows_count', obj._windows_count)
 			if windows_count > 0:
 				kwargs['window_size'] = kwargs['data'].shape[1] // windows_count
 
-			kwargs['extracted_feature'] = obj._extractor.extract(**kwargs)
+			extracted_feature = obj._extractor.extract(**kwargs)
 
-		transformed_dict = obj._transform(**kwargs)
+		transformed_dict = obj._transform(extracted_feature)
 
 		features, values = zip(*transformed_dict.items())
 
