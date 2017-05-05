@@ -19,51 +19,60 @@ class DatasetHandler:
 		self.files_iterator = kwargs.pop('csv_data')
 		self._vector_names  = ()
 
+		self.path = kwargs.pop('path')
 		self.opts = kwargs
 
 	@classmethod
 	def from_directory_csv (cls, **kwargs):
 		path = kwargs.pop('path', os.getcwd())
-		return cls(csv_data=iglob('%s/**/**/*.csv' % path))
+		return cls(csv_data=iglob('%s/**/**/*.csv' % path), path=path)
 
 	def __iter__ (self):
 		return self
 
 	def __next__ (self):
-		next_file = self.files_iterator.__next__()
-		label     = next_file[:next_file.find('.')]
+		try:
+			next_file = self.files_iterator.__next__()
+			label     = next_file[:next_file.find('.')] # fix had
 
-		data_whole   = np.genfromtxt(next_file, delimiter=',')
-		data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
+			data_whole   = np.genfromtxt(next_file, delimiter=',')
+			data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
-		features_names, feature_vector = self.vector_maker(data=data_streams, **self.opts)
+			features_names, feature_vector = self.vector_maker(data=data_streams, **self.opts)
 
-		if self._vector_names is ():
-			self._vector_names = features_names
-		elif self._vector_names != features_names:
-			raise Exception('features labels do not match')
+			if self._vector_names is ():
+				self._vector_names = features_names
+			elif self._vector_names != features_names:
+				raise Exception('features labels do not match')
 
-		return label, feature_vector
+			return label, feature_vector
+		except StopIteration as stop:
+			# reset object, for future use if needed
+			self.csv_data = iglob('%s/**/**/*.csv' % self.path)
+			# stop iterations
+			raise stop
 
-	# refactor !
-	def store_csv (self, **kwargs):
-		# , os.getcwd()
+	def __repr__ (self):
+		return ((label,) + vector for label, vector in self)
+
+	def __str__ (self):
+		# perfrom initial retreival
+		label, vector = self.__next__()
+		# write header to file
 		header = ('label',) + self._vector_names
-		# with open(kwargs.pop('csv_out'), 'w') as out:
-		# 	# print(header)
-		# 	out.write(', '.join(header))
-		# 	out.write('\n')
+		out.write(', '.join(header))
+		out.write('\n')
 
+		# write initial data to file
+
+		# loop over rest of the data
 		for label, vector in self:
 			pass
-				# data = ', '.join([str(v).replace(',', ' ').replace('[', ' ').replace(']', ' ') for v in vector])
-				# row  = ', '.join((label, data)).replace('\n', ' ')
 
-				# out.write(row)
-				# out.write('\n')
-
-		return self
-
+	def store_csv (self, **kwargs):
+		# , os.getcwd()
+		with open(kwargs.pop('csv_out'), 'w') as out:
+			out.write(str(self))
 
 if __name__ == '__main__':
 	dataset = DatasetHandler.from_directory_csv(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data')
