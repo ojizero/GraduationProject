@@ -6,13 +6,16 @@ sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 import os
 import re
 import numpy as np
+np.set_printoptions(threshold=np.inf, linewidth=np.inf)
+
 from glob import iglob
 
 from features.features_transformer import FeaturesTransformer
 from utils.decorators import classinstancemethod
 
 
-_path_label_pattern = '^.*\/(\w*)(?:\.\w+)?\/.*\.csv$'
+_verbal_code = re.compile(r'\s+|array|\(|\)|\'|"')
+_path_label_pattern = r'^.*/(\w*)(?:\.\w+)?/.*\.csv$'
 _rgx = re.compile(_path_label_pattern)
 
 
@@ -79,7 +82,7 @@ class DatasetHandler:
 
 	@staticmethod
 	def _inclose (*args):
-		return ', '.join('"%s"' % str(a).replace('"', "'") for a in args)
+		return ' ; '.join('%s' % _verbal_code.sub('', repr(a)) for a in args)
 
 	def store_csv (self, csv_out):
 		out_str = str(self)
