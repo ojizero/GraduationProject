@@ -21,8 +21,6 @@ class DatasetHandler:
 
 		self.path = kwargs.pop('path')
 		self.opts = kwargs
-		self._str = None
-		self._rpr = None
 
 	@classmethod
 	def from_csv_directory (cls, path):
@@ -61,27 +59,21 @@ class DatasetHandler:
 		# 	raise stop
 
 	def __repr__ (self):
-		if self._rpr is None:
-			self._rpr = repr((*((label,) + vector for label, vector in self),))
-
-		return self._rpr
+		return repr((*((label,) + vector for label, vector in self),))
 
 	def __str__ (self):
-		if self._str is None:
-			# perfrom initial retreival, this is to set the _vector_names parameter
-			label, vector = self.__next__()
-			# stringify header
-			header = self._inclose('label', *self._vector_names)
-			# stringify initial data
-			first_vector = self._inclose(label, *vector)
-			# generate the string object
-			self._str = '\n'.join([header, first_vector, *[self._inclose(label, *vector) for label, vector in self]])
-
-		return self._str
+		# perfrom initial retreival, this is to set the _vector_names parameter
+		label, vector = self.__next__()
+		# stringify header
+		header = self._inclose('label', *self._vector_names)
+		# stringify initial data
+		first_vector = self._inclose(label, *vector)
+		# generate the string object
+		return '\n'.join([header, first_vector, *[self._inclose(label, *vector) for label, vector in self]])
 
 	@staticmethod
 	def _inclose (*args):
-		return ', '.join(['"%s"' % str(a).replace('"', "'") for a in args])
+		return ', '.join('"%s"' % str(a).replace('"', "'") for a in args)
 
 	def store_csv (self, csv_out):
 		out_str = str(self)
