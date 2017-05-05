@@ -21,6 +21,7 @@ class DatasetHandler:
 
 		self.path = kwargs.pop('path')
 		self.opts = kwargs
+		self._str = None
 
 	@classmethod
 	def from_directory_csv (cls, **kwargs):
@@ -56,12 +57,13 @@ class DatasetHandler:
 		return ((label,) + vector for label, vector in self)
 
 	def __str__ (self):
+		ret = ''
 		# perfrom initial retreival
 		label, vector = self.__next__()
 		# write header to file
 		header = ('label',) + self._vector_names
-		out.write(', '.join(header))
-		out.write('\n')
+		ret += (', '.join(header))
+		ret += ('\n')
 
 		# write initial data to file
 
@@ -69,10 +71,12 @@ class DatasetHandler:
 		for label, vector in self:
 			pass
 
+		return ret
+
 	def store_csv (self, **kwargs):
-		# , os.getcwd()
-		with open(kwargs.pop('csv_out'), 'w') as out:
-			out.write(str(self))
+		self._str = str(self) if self._str is None else self._str
+		with open(kwargs['csv_out'], 'w') as out:
+			out.write(self._str)
 
 if __name__ == '__main__':
 	dataset = DatasetHandler.from_directory_csv(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data')
