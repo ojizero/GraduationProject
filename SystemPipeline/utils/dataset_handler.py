@@ -89,6 +89,27 @@ class DatasetHandler:
 		with open(csv_out, 'w') as out:
 			out.write(out_str)
 
+	# instead of storing the whole dataset in memory as string
+	# perform iteration while outputing to the file
+	def store_csv_immediate (self, csv_out):
+		with open(csv_out, 'w') as out:
+			# perfrom initial retreival, this is to set the _vector_names parameter
+			label, vector = self.__next__()
+			# write header
+			header = self._inclose('label', *self._vector_names)
+			out.write(header)
+			out.write('\n')
+			# write initial data
+			first_vector = self._inclose(label, *vector)
+			out.write(first_vector)
+			out.write('\n')
+
+			for label, vector in self:
+				output = self._inclose(label, *vector)
+				out.write(output)
+				out.write('\n')
+
+
 if __name__ == '__main__':
 	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/6a')
 
