@@ -34,7 +34,7 @@ class DatasetHandler:
 
 	@classmethod
 	def from_csv_directory (cls, path):
-		return cls(csv_data=iglob('%s/*.csv' % path), path=path)
+		return cls(csv_data=iglob('%s/**/**/*.csv' % path), path=path)
 
 	@classmethod
 	def from_csv_file (cls, **kwargs):
@@ -61,37 +61,12 @@ class DatasetHandler:
 			raise Exception('features labels do not match')
 
 		return label, feature_vector
-		# except StopIteration as stop:
-		# 	# reset object, for future use if needed
-		# 	self.csv_data = iglob('%s/**/**/*.csv' % self.path)
-		# 	# stop iterations
-		# 	raise stop
-
-	def __repr__ (self):
-		return repr((*((label,) + vector for label, vector in self),))
-
-	def __str__ (self):
-		# perfrom initial retreival, this is to set the _vector_names parameter
-		label, vector = self.__next__()
-		# stringify header
-		header = self._inclose('label', *self._vector_names)
-		# stringify initial data
-		first_vector = self._inclose(label, *vector)
-		# generate the string object
-		return '\n'.join([header, first_vector, *[self._inclose(label, *vector) for label, vector in self]])
 
 	@staticmethod
 	def _inclose (*args):
 		return ' ; '.join('%s' % _verbal_code.sub('', repr(a)) for a in args)
 
 	def store_csv (self, csv_out):
-		out_str = str(self)
-		with open(csv_out, 'w') as out:
-			out.write(out_str)
-
-	# instead of storing the whole dataset in memory as string
-	# perform iteration while outputing to the file
-	def store_csv_immediate (self, csv_out):
 		with open(csv_out, 'w') as out:
 			# perfrom initial retreival, this is to set the _vector_names parameter
 			label, vector = self.__next__()
@@ -103,7 +78,7 @@ class DatasetHandler:
 			first_vector = self._inclose(label, *vector)
 			out.write(first_vector)
 			out.write('\n')
-
+			# write rest of data
 			for label, vector in self:
 				output = self._inclose(label, *vector)
 				out.write(output)
@@ -111,6 +86,6 @@ class DatasetHandler:
 
 
 if __name__ == '__main__':
-	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/6a')
+	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data')
 
 	dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset_dump.csv')
