@@ -22,63 +22,73 @@ class DatasetHandler:
 		self.path = kwargs.pop('path')
 		self.opts = kwargs
 		self._str = None
+		self._rpr = None
 
 	@classmethod
-	def from_directory_csv (cls, **kwargs):
-		path = kwargs.pop('path', os.getcwd())
+	def from_csv_directory (cls, path):
 		return cls(csv_data=iglob('%s/**/**/*.csv' % path), path=path)
+
+	@classmethod
+	def from_csv_file (cls, **kwargs):
+		pass
 
 	def __iter__ (self):
 		return self
 
+	# find a way to reset the object, or store it somehow
+	# currently it can be iterated over only once
 	def __next__ (self):
-		try:
-			next_file = self.files_iterator.__next__()
-			label     = next_file[:next_file.find('.')] # fix had
+		# try:
+		next_file = self.files_iterator.__next__()
+		label     = next_file[:next_file.find('.')] # fix had
 
-			data_whole   = np.genfromtxt(next_file, delimiter=',')
-			data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
+		data_whole   = np.genfromtxt(next_file, delimiter=',')
+		data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
-			features_names, feature_vector = self.vector_maker(data=data_streams, **self.opts)
+		features_names, feature_vector = self.vector_maker(data=data_streams, **self.opts)
 
-			if self._vector_names is ():
-				self._vector_names = features_names
-			elif self._vector_names != features_names:
-				raise Exception('features labels do not match')
+		print (next_file)
+		if self._vector_names is ():
+			self._vector_names = features_names
+		elif self._vector_names != features_names:
+			raise Exception('features labels do not match')
 
-			return label, feature_vector
-		except StopIteration as stop:
-			# reset object, for future use if needed
-			self.csv_data = iglob('%s/**/**/*.csv' % self.path)
-			# stop iterations
-			raise stop
+		return label, feature_vector
+		# except StopIteration as stop:
+		# 	# reset object, for future use if needed
+		# 	self.csv_data = iglob('%s/**/**/*.csv' % self.path)
+		# 	# stop iterations
+		# 	raise stop
 
 	def __repr__ (self):
-		return ((label,) + vector for label, vector in self)
+		if self._rpr is None:
+			self._rpr = repr((*((label,) + vector for label, vector in self),))
+
+		return self._rpr
 
 	def __str__ (self):
-		ret = ''
-		# perfrom initial retreival
-		label, vector = self.__next__()
-		# write header to file
-		header = ('label',) + self._vector_names
-		ret += (', '.join(header))
-		ret += ('\n')
+		if self._str is None:
+			# perfrom initial retreival, this is to set the _vector_names parameter
+			label, vector = self.__next__()
+			# stringify header
+			header = self._inclose('label', *self._vector_names)
+			# stringify initial data
+			first_vector = self._inclose(label, *vector)
+			# generate the string object
+			self._str = '\n'.join([header, first_vector, *[self._inclose(label, *vector) for label, vector in self]])
 
-		# write initial data to file
+		return self._str
 
-		# loop over rest of the data
-		for label, vector in self:
-			pass
+	@staticmethod
+	def _inclose (*args):
+		return ', '.join(['"%s"' % str(a).replace('"', "'") for a in args])
 
-		return ret
-
-	def store_csv (self, **kwargs):
-		self._str = str(self) if self._str is None else self._str
-		with open(kwargs['csv_out'], 'w') as out:
-			out.write(self._str)
+	def store_csv (self, csv_out):
+		out_str = str(self)
+		with open(csv_out, 'w') as out:
+			out.write(out_str)
 
 if __name__ == '__main__':
-	dataset = DatasetHandler.from_directory_csv(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data')
+	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data')
 
-	dataset.store_csv(csv_out='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset_dump.csv')
+	dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset_dump.csv')
