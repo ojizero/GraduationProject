@@ -6,11 +6,11 @@ sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 import os
 import re
 import numpy as np
-np.set_printoptions(threshold=np.inf, linewidth=np.inf)
-
 from glob import iglob
 
-from features.features_transformer import FeaturesTransformer
+# configure pringing optiosn of numpy
+np.set_printoptions(threshold=np.inf, linewidth=np.inf)
+
 from utils.decorators import classinstancemethod
 
 
