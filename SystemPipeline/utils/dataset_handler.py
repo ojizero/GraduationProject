@@ -12,7 +12,7 @@ from glob import iglob
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
 from utils.decorators import classinstancemethod
-
+from features.features_transformer import FeaturesTransformer
 
 _verbal_code = re.compile(r'\s+|array|\(|\)|\'|"')
 _path_label_pattern = r'^.*/(\w*)(?:\.\w+)?/.*\.csv$'
