@@ -19,8 +19,8 @@ _path_label_pattern = r'^.*/(\w*)(?:\.\w+)?/.*\.csv$'
 _rgx = re.compile(_path_label_pattern)
 
 _array_regex = re.compile(r'^\[.*\]$')
-_float_regex = re.compile(r'^\d*(?:\.\d+)?$')
-_cmplx_regex = re.compile(r'^.*[+-]\d+(?:\.\d+)?j$')
+_float_regex = re.compile(r'^[+-]?\d+(?:\.\d*)?(?:e[+-]\d+)?$')
+_cmplx_regex = re.compile(r'^(?:[+-]?\d+(?:\.\d*)?(?:e[+-]\d+)?[+-])?[+-]?\d+(?:\.\d*)?(?:e[+-]\d+)?j$')
 
 
 class DatasetHandler:
@@ -51,16 +51,14 @@ class DatasetHandler:
 
 	@classmethod
 	def from_csv_file (cls, path, delimiter=';', **kwargs):
-		input_generator = cls._input_csv_generator(path)
+		input_generator = cls._input_generator(path)
 
 		vector_names = tuple(col.strip() for col in input_generator.__next__().decode().split(delimiter)[1:])
 		vector_maker = lambda row: (row[0], vector_names, row[1:])
 
 		def _dataset_generator ():
-			for row in np.genfromtxt(input_generator, delimiter=delimiter, dtype=np.complex):
-				yield vector_maker(row)
-			# for row in input_generator:
-			# 	yield vector_maker(cls._convert_str(row, delimiter))
+			for row in input_generator:
+				yield vector_maker(cls._convert_str(row, delimiter))
 
 		return cls(dataset_iterator=_dataset_generator(), vector_names=vector_names, **kwargs)
 
@@ -68,14 +66,14 @@ class DatasetHandler:
 		return self
 
 	def __next__ (self):
-		label, features_names, feature_vector = self.dataset_iterator.__next__()
+		label, features_names, features_vector = self.dataset_iterator.__next__()
 
 		if self.vector_names is ():
 			self.vector_names = features_names
 		elif self.vector_names != features_names:
-			raise Exception('features labels do not match')
+			raise ValueError('features labels do not match')
 
-		return label, feature_vector
+		return label, features_vector
 
 	def store_csv (self, csv_out):
 		with open(csv_out, 'w') as out:
@@ -100,27 +98,26 @@ class DatasetHandler:
 		return ' ; '.join('%s' % _verbal_code.sub('', repr(a)) for a in args)
 
 	@staticmethod
-	def _input_csv_generator (csv_in):
+	def _input_generator (csv_in):
 		with open(csv_in, 'rb') as in_:
 			for line in in_:
 				yield line
 
 	@staticmethod
 	def _convert_str (string, delimiter):
-		# return string
 		if isinstance(string, bytes):
 			string = string.decode()
 
-		is_array = lambda s: _array_regex.match(s)
-		is_float = lambda s: _float_regex.match(s)
-		is_cmplx = lambda s: _cmplx_regex.match(s)
+		is_array = lambda s: _array_regex.match(s) is not None
+		is_float = lambda s: _float_regex.match(s) is not None
+		is_cmplx = lambda s: _cmplx_regex.match(s) is not None
 
+		cols = string.split(delimiter)
 		def _converter ():
-			cols = string.split(delimiter)
-
-			for col in cols:
+			for col in cols[1:]:
 				ret = None
-
+				col = col.strip()
+				print(col)
 				if is_array(col):
 					ret = DatasetHandler._convert_str(col[1:-1], ',')
 				elif is_float(col):
@@ -128,21 +125,23 @@ class DatasetHandler:
 				elif is_cmplx(col):
 					ret = np.complex(col)
 				else:
-					print(type(col), col)
-					raise Exception('unhandled datatype')
+					raise ValueError('unhandled datatype')
 
 				yield ret
 
-		return np.array([*_converter()])
+		return np.array([cols[0], *_converter()], dtype=object)
 
 
 
 
 if __name__ == '__main__':
-	# dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data')
+	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data', overlap=0.2)
 
-	# dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset_dump.csv')
-	dataset = DatasetHandler.from_csv_file('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset_sample.csv')
+	dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset.fromraw.noseg.overlap20.csv')
 
-	for d in dataset:
-		print(d)
+	# dataset = DatasetHandler.from_csv_file('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset_sample.csv')
+
+	# for l, d in dataset:
+	# 	print(l)
+	# 	for c in d:
+	# 		print(type(c), end=' ;; ')
