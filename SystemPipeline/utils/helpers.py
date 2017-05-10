@@ -36,7 +36,9 @@ def _linear_normalizer (data, constraint, discrete=True):
 	if not isinstance(data, np.array):
 		data = np.array(data)
 
-	operator = lambda a, b: a * b // a if discrete else a * b / a
+	max_ = max(data)
+
+	operator = lambda a, b: a * b // max_ if discrete else a * b / max_
 
 	ret = np.array([np.nan] * constraint)
 	for index, value in enumerate(data):
@@ -63,11 +65,14 @@ def flatten_vector (*args):
 			key, val = arg
 			assert isinstance(key, str), 'keys must be strings'
 
-			if isinstance(val, Iterable):
+			if isinstance(val, Iterable) and not isinstance(arg, (str, bytes)):
 				flattened = flatten_vector(*val)
-				yield from ((key + index, value) for index, value in enumerate(flattened))
+				yield from (('%s_%s' % (key, index), value) for index, value in enumerate(flattened))
 			else:
 				yield arg
 		else:
-			yield from _flatten(*arg)
+			if isinstance(arg, Iterable) and not isinstance(arg, (str, bytes)):
+				yield from flatten_vector(*arg)
+			else:
+				yield arg
 

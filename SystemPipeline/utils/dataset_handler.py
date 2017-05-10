@@ -33,11 +33,10 @@ class DatasetHandler:
 		self.opts = kwargs
 
 	@classmethod
-	def from_csv_directory (cls, path, **kwargs):
+	def from_csv_directory (cls, path, delimiter=',', **kwargs):
 		files_iterator = iglob('%s/**/**/*.csv' % path)
 		vector_maker   = kwargs.pop('vector_maker', cls._FEATURE_VECTOR_EXTRACTOR)
 		label_maker    = kwargs.pop('label_maker', lambda path: _rgx.search(path).groups()[0])
-		delimiter      = kwargs.pop('delimiter', ',')
 
 		def _dataset_generator ():
 			for next_file in files_iterator:
