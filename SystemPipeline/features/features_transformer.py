@@ -5,7 +5,7 @@ sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 
 from features.features_extractor import FeaturesExtractor
 from utils.decorators import classinstancemethod
-
+from utils.helpers import flatten_vector
 
 class FeaturesTransformer:
 	'''
@@ -29,7 +29,9 @@ class FeaturesTransformer:
 
 		transformed_dict = obj._transform(extracted_feature)
 
-		features, values = zip(*transformed_dict.items())
+		falttened_vector = flatten_vector(*transformed_dict.items())
+
+		features, values = zip(*falttened_vector)
 
 		return features, values
 
