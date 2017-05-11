@@ -17,18 +17,18 @@ class Extractor:
 	@classinstancemethod
 	def extract (obj, **kwargs):
 		assert kwargs.get('data', []) != [], '`data` is a required parameter'
-		data = kwargs['data']
+		data = kwargs.pop('data')
 
 		## parameters and their default values
 		if not kwargs.get('multi', True):
 			data = np.array([data])
 
-		window_size = kwargs.get('window_size', obj._WINDOW_SIZE)
+		window_size = kwargs.pop('window_size', obj._WINDOW_SIZE)
 
-		overlap = kwargs.get('overlap', 0.0)
+		overlap = kwargs.pop('overlap', 0.0)
 		assert 0.0 <= overlap < 1
 
-		transformer = kwargs.get('transformer', obj._TRANSFORMER)
+		transformer = kwargs.pop('transformer', obj._TRANSFORMER)
 
 		## method logic
 		begin = border = window_size // 2
