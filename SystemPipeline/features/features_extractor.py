@@ -13,43 +13,79 @@ from utils.helpers import array_length_normalizer
 
 
 class FeaturesExtractor (Extractor):
-	_EXTRACT_ON  = lambda string: match('^[^_].*_feature$', string)
+	_EXTRACT_ON  = lambda string: match('^[^_].*_feature(?:s?_?set)?$', string)
 
 	@staticmethod
-	def autocorrelate_feature (**kwargs):
+	def arg_max (data):
+		return FeaturesExtractor._generic_loop(data, np.argmax)
+
+	@staticmethod
+	def arg_min (data):
+		return FeaturesExtractor._generic_loop(data, np.argmin)
+
+	@staticmethod
+	def avg (data):
+		return FeaturesExtractor._generic_loop(data, np.average)
+
+	@staticmethod
+	def arg_avg (data):
+		_func = lambda w: np.argmin(np.absolute(w - np.average(w)))
+		return FeaturesExtractor._generic_loop(data, _func)
+
+	@staticmethod
+	def autocorrelate_feature_set (**kwargs):
 		length_normalizer = kwargs.pop('length_normalizer', array_length_normalizer)
 		_autocorrelation  = lambda w: np.correlate(w, w, mode='full')
-		autocorrelation   = FeaturesExtractor._generic_loop(kwargs['data_column'], _autocorrelation)
 
-		normalized_autocorrelation = \
-			FeaturesExtractor._generic_loop(autocorrelation, length_normalizer)
+		# calculate main feature
+		autocorrelation = FeaturesExtractor._generic_loop(kwargs['data_column'], _autocorrelation)
 
-		arg_max_autocorrelation    = \
-			FeaturesExtractor._generic_loop(autocorrelation, np.argmax)
-
-		arg_min_autocorrelation    = \
-			FeaturesExtractor._generic_loop(autocorrelation, np.argmin)
-
-		avg_autocorrelation        = \
-			FeaturesExtractor._generic_loop(autocorrelation, np.average)
-
-		arg_avg_autocorrelation    = \
-			FeaturesExtractor._generic_loop(autocorrelation, lambda a: np.argmin(np.absolute(a - np.average(a))))
+		# reduce feature to a controlled feature set
+		normalized_autocorrelation = FeaturesExtractor._generic_loop(autocorrelation, length_normalizer)
+		arg_max_autocorrelation    = FeaturesExtractor.arg_max(autocorrelation)
+		arg_min_autocorrelation    = FeaturesExtractor.arg_min(autocorrelation)
+		avg_autocorrelation        = FeaturesExtractor.avg(autocorrelation)
+		arg_avg_autocorrelation    = FeaturesExtractor.arg_avg(autocorrelation)
 
 		return (
 			( {
 				'normalized_autocorrelation': normalized_autocorrelation[s_index,w_index],
-				'arg_max_autocorrelation': arg_max_autocorrelation[s_index,w_index],
-				'arg_min_autocorrelation': arg_min_autocorrelation[s_index,w_index],
-				'avg_autocorrelation': avg_autocorrelation[s_index,w_index],
-				'arg_avg_autocorrelation': arg_avg_autocorrelation[s_index,w_index]
+				'arg_max_autocorrelation'   : arg_max_autocorrelation[s_index,w_index],
+				'arg_min_autocorrelation'   : arg_min_autocorrelation[s_index,w_index],
+				'avg_autocorrelation'       : avg_autocorrelation[s_index,w_index],
+				'arg_avg_autocorrelation'   : arg_avg_autocorrelation[s_index,w_index]
 			} for w_index, _ in enumerate(stream) )
 				for s_index, stream in enumerate(kwargs['data_column'])
 		)
 
 	@staticmethod
-	def _dft_feature (data_column, **kwargs):
-		return FeaturesExtractor._generic_loop(data_column, np.fft.fft)
+	def frequency_feature_set (**kwargs):
+		length_normalizer = kwargs.pop('length_normalizer', array_length_normalizer)
+		# companion feature
+		_dc_component     = lambda dft: dft[0]
+
+		# calculate main feature
+		dft = FeaturesExtractor._generic_loop(kwargs['data_column'], np.fft.fft)
+
+		# reduce feature to a controlled feature set
+		normalized_dft = FeaturesExtractor._generic_loop(dft, length_normalizer)
+		arg_max_dft    = FeaturesExtractor.arg_max(dft)
+		arg_min_dft    = FeaturesExtractor.arg_min(dft)
+		avg_dft        = FeaturesExtractor.avg(dft)
+		arg_avg_dft    = FeaturesExtractor.arg_avg(dft)
+		dc_component   = FeaturesExtractor._generic_loop(dft, _dc_component)
+
+		return (
+			( {
+				'normalized_dft': normalized_dft[s_index,w_index],
+				'arg_max_dft'   : arg_max_dft[s_index,w_index],
+				'arg_min_dft'   : arg_min_dft[s_index,w_index],
+				'avg_dft'       : avg_dft[s_index,w_index],
+				'arg_avg_dft'   : arg_avg_dft[s_index,w_index],
+				'dc_component'  : dc_component[s_index, w_index]
+			} for w_index, _ in enumerate(stream) )
+				for s_index, stream in enumerate(kwargs['data_column'])
+		)
 
 	@staticmethod
 	def mean_feature (data_column, **kwargs):
@@ -85,32 +121,6 @@ class FeaturesExtractor (Extractor):
 	def rms_feature (data_column, **kwargs):
 		_feature = lambda w: np.sqrt(sum(w**2))/len(w)
 		return FeaturesExtractor._generic_loop(data_column, _feature)
-
-	# @staticmethod
-	# def dc_component_feature (data_column, **kwargs):
-	# 	_feature = lambda dft: dft[0]
-	# 	return FeaturesExtractor._generic_loop(FeaturesExtractor._dft_feature(data_column), _feature)
-
-	# @staticmethod
-	# def _dft_argmax_feature (data_column, **kwargs):
-	# 	_feature  = lambda dft: np.argmax(dft)
-	# 	return FeaturesExtractor._generic_loop(FeaturesExtractor._dft_feature(data_column), _feature)
-
-	# @staticmethod
-	# def _dft_argmin_feature (data_column, **kwargs):
-	# 	_feature  = lambda dft: np.argmin(dft)
-	# 	return FeaturesExtractor._generic_loop(FeaturesExtractor._dft_feature(data_column), _feature)
-
-	# @staticmethod
-	# def _dft_average_feature (data_column, **kwargs):
-	# 	_feature = lambda dft: np.average(dft)
-	# 	return FeaturesExtractor._generic_loop(FeaturesExtractor._dft_feature(data_column), _feature)
-
-	# @staticmethod
-	# def _dft_argaverage_feature (data_column, **kwargs):
-	# 	_feature = lambda dft: dft[dft == np.average(dft)]
-	# 	return FeaturesExtractor._generic_loop(FeaturesExtractor._dft_feature(data_column), _feature)
-
 
 
 if __name__ == '__main__':

@@ -37,11 +37,9 @@ def _linear_normalizer (data, constraint, discrete=True):
 
 	scale_operator = lambda a, b: a * b // max_ if discrete else a * b / max_
 
-	ret = np.array([np.nan] * constraint)
+	ret = np.array([np.nan] * constraint, dtype=data.dtype)
 	for index, value in enumerate(data):
-		indx = int(scale_operator(index, constraint))
-		# print(indx)
-		ret[indx] = value
+		ret[int(scale_operator(index, constraint))] = value
 
 	return _interpolate_nan_linear(ret)
 
