@@ -5,7 +5,7 @@ sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 
 from features.features_extractor import FeaturesExtractor
 from utils.decorators import classinstancemethod
-from utils.helpers import flatten_vector
+from utils.helpers import flatten_key_val_vector
 
 class FeaturesTransformer:
 	'''
@@ -29,9 +29,9 @@ class FeaturesTransformer:
 
 		transformed_dict = obj._transform(extracted_feature)
 
-		falttened_vector = flatten_vector(*transformed_dict.items())
+		flattened_vector = flatten_key_val_vector(*transformed_dict.items())
 
-		features, values = zip(*falttened_vector)
+		features, values = zip(*flattened_vector)
 
 		return features, values
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
 	# assert success
 	for v in transformed[1]:
-		assert not isinstance(v, Iterable) or isinstance(arg, (str, bytes)), 'failed'
+		assert not isinstance(v, Iterable) or isinstance(v, (str, bytes)), 'failed'
 
 	with open('transformer_dump', 'w') as f:
 		f.write(str(transformed))
