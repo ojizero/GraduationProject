@@ -14,35 +14,30 @@ def pipeline (data, *transformers):
 	return data
 
 def _interpolate_nan_linear (input):
-	if not np.any(np.isnan(input)):
-		return input
+	while np.any(np.isnan(input)):
+		indices = np.where(np.logical_not(np.isnan(input)))
+		for ix, i in enumerate(indices):
+			if ix == 0:
+				continue
 
-	indices = np.where(np.logical_not(np.isnan(input)))
-	for ix, i in enumerate(indices):
-		if ix == 0:
-			continue
-		if ix == len(indices) - 1:
-			break
+			dif = i - indices[ix-1]
+			if dif > 1:
+				index = (i + indices[ix-1]) // 2
+				input[index] = (input[i] + input[indices[ix-1]]) / 2
 
-		dif = i - indices[ix-1]
-		if dif > 1:
-			index = (i + indices[ix-1]) // 2
-			input[index] = (input[i] + input[indices[ix-1]]) / 2
+	return input
 
-	return _interpolate_nan_linear(input)
-
-# stupid implementation >_<
 def _linear_normalizer (data, constraint, discrete=True):
 	if not isinstance(data, np.array):
 		data = np.array(data)
 
 	max_ = max(data)
 
-	operator = lambda a, b: a * b // max_ if discrete else a * b / max_
+	scale_operator = lambda a, b: a * b // max_ if discrete else a * b / max_
 
 	ret = np.array([np.nan] * constraint)
 	for index, value in enumerate(data):
-		ret[operator(index, constraint)] = value
+		ret[scale_operator(index, constraint)] = value
 
 	return _interpolate_nan_linear(ret)
 
@@ -52,7 +47,7 @@ def _logarithmic_normalizer (data, constraint):
 def array_normalizer (array, constraint_length=10, normalization_method=_linear_normalizer):
 	return normalization_method(array, constraint_length)
 
-def _flatten (*l):
+def _flatten (l):
 	for el in l:
 		if isinstance(el, Iterable) and not isinstance(el, (str, bytes)):
 			yield from _flatten(el)

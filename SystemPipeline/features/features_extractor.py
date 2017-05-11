@@ -8,6 +8,7 @@ import scipy.stats as st
 
 from features.extractor import Extractor
 from utils.decorators import staticmethod
+from utils.helpers import array_normalizer
 
 
 class FeaturesExtractor (Extractor):
@@ -15,6 +16,10 @@ class FeaturesExtractor (Extractor):
 	def autocorrelate_feature (data_column, **kwargs):
 		_feature = lambda w: np.correlate(w, w, mode='full')
 		return FeaturesExtractor._generic_loop(data_column, _feature)
+
+	@staticmethod
+	def dft_feature (data_column, **kwargs):
+		return FeaturesExtractor._generic_loop(data_column, np.fft.fft)
 
 	@staticmethod
 	def mean_feature (data_column, **kwargs):
@@ -31,10 +36,6 @@ class FeaturesExtractor (Extractor):
 	@staticmethod
 	def kurtoises_feature (data_column, **kwargs):
 		return FeaturesExtractor._generic_loop(data_column, st.kurtosis)
-
-	@staticmethod
-	def dft_feature (data_column, **kwargs):
-		return FeaturesExtractor._generic_loop(data_column, np.fft.fft)
 
 	@staticmethod
 	def entropy_feature (data_column, **kwargs):
