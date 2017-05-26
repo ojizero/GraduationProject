@@ -17,12 +17,15 @@ if __name__ == '__main__':
 
 	training_labels, training_data = dataset.as_arrays()
 
-	selector = SelectKBest(anova_score, 550)
-	selector.fit(training_data, training_labels)
-
 	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/native_data', delimiter=',')
 
 	testing_labels, testing_data = dataset.as_arrays()
+
+	selector = SelectKBest(anova_score, 550)
+	selector.fit(training_data, training_labels)
+
+	training_data = selector.transform(training_data)
+	testing_data  = selector.transform(testing_data)
 
 	# classifier object
 	classifier_instance = GaussianNB()
