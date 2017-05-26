@@ -90,7 +90,27 @@ def vector_maker (data, **kwargs):
 	active_region_data = np.array([*processed_data[:,active_start:active_end], *ref_accel])
 	print(data.shape, active_region_data.shape)
 
-	return FeaturesTransformer.transform(data=active_region_data, **kwargs)
+	vector_names, vector_values = FeaturesTransformer.transform(data=active_region_data, **kwargs)
+
+	# stpe size
+	step = len(vector_names) // 6
+
+	# group sensor readings
+	vector_names = np.array([
+		np.array(vector_names[pivot:pivot+step]) for pivot in range(0, len(vector_names), step)
+	])
+	# group sensor readings
+	vector_values = np.array([
+		np.array(vector_values[pivot:pivot+step]) for pivot in range(0, len(vector_values), step)
+	])
+
+	reference_vector = (tuple(vector_names[-1]), tuple(vector_values[-1]))
+	fingers_vector   = (tuple(vector_names[0]), tuple(np.apply_along_axis(np.cov, 0, vector_values[0:5])))
+
+	vector_names  = fingers_vector[0] + reference_vector[0]
+	vector_values = fingers_vector[1] + reference_vector[1]
+
+	return vector_names, vector_values
 
 dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data', overlap=0.0, vector_maker=vector_maker)
 dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.dump.csv')
