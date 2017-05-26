@@ -41,7 +41,8 @@ class DatasetHandler:
 				with open(next_file, 'r') as f:
 					data_whole   = np.genfromtxt(next_file, delimiter=delimiter)
 					# read only accel heek
-					data_streams = np.array([data_whole[:,r+3:r+6] for r in range(0, 54, 9)])
+					# data_streams = np.array([data_whole[:,r+3:r+6] for r in range(0, 54, 9)])
+					data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 					print(next_file)
 					try:
 						yield (label_maker(next_file),) + vector_maker(data=data_streams, **kwargs)
@@ -90,13 +91,16 @@ class DatasetHandler:
 		return labels, values
 
 	def store_csv (self, csv_out):
-		with open(csv_out, 'wb') as out:
+		# append to file
+		with open(csv_out, 'ab') as out:
 			# perfrom initial retreival, this is to set the _vector_names parameter
 			label, vector = self.__next__()
 			header = ('label',) + self.vector_names
-			# print(header)
-			out.write((','.join(header)).encode())
-			out.write(b'\n')
+
+			if (self.opts.get('store_header', True)):
+				out.write((','.join(header)).encode())
+				out.write(b'\n')
+
 			# write initial data
 			out.write(b'%s,' % label.encode())
 			np.savetxt(out, vector, delimiter=',', newline=',')
