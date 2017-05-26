@@ -1,6 +1,8 @@
 import numpy as np
 from itertools import zip_longest
 from collections import Iterable
+from sklearn.model_selection import train_test_split
+from sklearn.feature_selection import SelectKBest, f_classif as anova_score
 
 
 def grouper (iterable, n, fillvalue=None):
@@ -86,3 +88,29 @@ def flatten_key_val_vector (*args):
 			else:
 				yield arg
 
+def accuracy_beahviour (data, labels, classifier, score_function=anova_score):
+	'''
+		Generator for the behaviour of given classifier on given data, forall
+		N in range(number of features) top features
+	'''
+	# split training and testing data
+	training_data, testing_data, training_labels, testing_labels = train_test_split(data, labels)
+	for N in range(1, data.shape[1]):
+		# feature selection object, using ANOVA F-value for scoring
+		selector = SelectKBest(score_function, N)
+		# the dataset using a sample of the features (top N features)
+		selector.fit(data, labels)
+
+		training_subset = selector.transform(training_data)
+		testing_subset  = selector.transform(testing_data)
+
+		# classifier object
+		classifier_instance = classifier()
+		# train on training subset
+		classifier_instance.fit(training_subset, training_labels)
+		# test on teseting subset
+		testing  = classifier_instance.predict(testing_subset)
+		accuracy = np.average(testing == testing_labels)
+
+		yield accuracy
+		print('accuracy for %s is %s' % (N, accuracy))
