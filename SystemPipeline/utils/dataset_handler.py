@@ -147,7 +147,7 @@ class DatasetHandler:
 				elif is_cmplx(col):
 					ret = np.complex(col)
 				else:
-					raise ValueError('unhandled datatype')
+					raise ValueError('unhandled datatype :: "%s"' % col)
 
 				yield ret
 
