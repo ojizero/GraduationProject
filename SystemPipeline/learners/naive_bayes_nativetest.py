@@ -13,14 +13,14 @@ if __name__ == '__main__':
 	from utils.helpers import accuracy_beahviour
 	from utils.dataset_handler import DatasetHandler
 
-	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.accel.only.dump.csv', delimiter=',')
+	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data', delimiter=',')
 
 	training_labels, training_data = dataset.as_arrays()
 
 	selector = SelectKBest(anova_score, 550)
 	selector.fit(training_data, training_labels)
 
-	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.accel.only.dump.csv', delimiter=',')
+	dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/native_data', delimiter=',')
 
 	testing_labels, testing_data = dataset.as_arrays()
 
