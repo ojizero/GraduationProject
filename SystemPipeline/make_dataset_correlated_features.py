@@ -85,11 +85,9 @@ def vector_maker (data, **kwargs):
 	ref_accel = np.array([data[5,active_start:active_end,2:6]])
 	ref_accel[0,:,0] = 0
 
-	processed_data = processed_data[:,active_start:active_end]
-
 	# all quaternion numbers from active reagion, fingers streams
 	# acceleration readings from active region, reference stream
-	active_region_data = np.array([*processed_data, *ref_accel])
+	active_region_data = np.array([*processed_data[:,active_start:active_end], *ref_accel])
 	print(data.shape, active_region_data.shape)
 
 	return FeaturesTransformer.transform(data=active_region_data, **kwargs)

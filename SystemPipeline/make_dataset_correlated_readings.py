@@ -85,7 +85,8 @@ def vector_maker (data, **kwargs):
 	ref_accel = np.array([data[5,active_start:active_end,2:6]])
 	ref_accel[0,:,0] = 0
 
-	processed_data = processed_data[:,active_start:active_end]
+	# get covariance of all readings per stream
+	processed_data = np.apply_along_axis(np.cov, 0, processed_data[:,active_start:active_end])
 
 	# all quaternion numbers from active reagion, fingers streams
 	# acceleration readings from active region, reference stream
@@ -95,4 +96,4 @@ def vector_maker (data, **kwargs):
 	return FeaturesTransformer.transform(data=active_region_data, **kwargs)
 
 dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data', overlap=0.0, vector_maker=vector_maker)
-dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.dump.csv')
+dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.correlated.dump.csv')
