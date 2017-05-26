@@ -18,4 +18,4 @@ if __name__ == '__main__':
 
 	accuracies = [*accuracy_beahviour(data, labels, GaussianNB)]
 	plt.plot(accuracies)
-	plt.show()
+	plt.savefig('/Users/oji/Desktop/remade_accel_vs_numfeatures.png')

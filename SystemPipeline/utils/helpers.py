@@ -88,12 +88,14 @@ def flatten_key_val_vector (*args):
 			else:
 				yield arg
 
-def accuracy_beahviour (data, labels, classifier, score_function=anova_score):
+def accuracy_beahviour (data, labels, classifier, score_function=anova_score, epislon=0, ksi=0.05, rep=10):
 	'''
 		Generator for the behaviour of given classifier on given data, forall
 		N in range(number of features) top features
 	'''
 	# split training and testing data
+	prev_acc, prev_cnt = 0, 0
+
 	training_data, testing_data, training_labels, testing_labels = train_test_split(data, labels)
 	for N in range(1, data.shape[1]):
 		# feature selection object, using ANOVA F-value for scoring
@@ -114,3 +116,12 @@ def accuracy_beahviour (data, labels, classifier, score_function=anova_score):
 
 		yield accuracy
 		print('accuracy for %s is %s' % (N, accuracy))
+
+		# this code block is to avoid the segfault that occurs on the code in this case
+		if abs(prev_acc - accuracy) <= epislon and accuracy <= ksi:
+			prev_cnt += 1
+
+		if prev_cnt >= rep:
+			raise StopIteration('avoided possible segfault')
+
+		prev_acc = accuracy
