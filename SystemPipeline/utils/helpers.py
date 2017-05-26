@@ -88,7 +88,7 @@ def flatten_key_val_vector (*args):
 			else:
 				yield arg
 
-def accuracy_beahviour (data, labels, classifier, score_function=anova_score, epislon=0, ksi=0.05, rep=10):
+def accuracy_beahviour (data, labels, classifier, clf_ops={}, score_function=anova_score, epislon=0, ksi=0.05, rep=10):
 	'''
 		Generator for the behaviour of given classifier on given data, forall
 		N in range(number of features) top features
@@ -107,7 +107,7 @@ def accuracy_beahviour (data, labels, classifier, score_function=anova_score, ep
 		testing_subset  = selector.transform(testing_data)
 
 		# classifier object
-		classifier_instance = classifier()
+		classifier_instance = classifier(**clf_ops)
 		# train on training subset
 		classifier_instance.fit(training_subset, training_labels)
 		# test on teseting subset
