@@ -91,7 +91,8 @@ class DatasetHandler:
 		return labels, values
 
 	def store_csv (self, csv_out):
-		with open(csv_out, 'wb') as out:
+		# append to file
+		with open(csv_out, 'ab') as out:
 			# perfrom initial retreival, this is to set the _vector_names parameter
 			label, vector = self.__next__()
 			header = ('label',) + self.vector_names
