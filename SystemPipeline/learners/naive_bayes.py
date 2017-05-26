@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
 	from utils.dataset_handler import DatasetHandler
 
-	dataset = DatasetHandler.from_csv_file(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/dataset.new.rawdata.noseg.csv', delimiter=',')
+	dataset = DatasetHandler.from_csv_file(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.dump.csv', delimiter=',')
 
 	labels, data = dataset.as_arrays()
 

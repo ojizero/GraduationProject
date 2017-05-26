@@ -96,9 +96,11 @@ class DatasetHandler:
 			# perfrom initial retreival, this is to set the _vector_names parameter
 			label, vector = self.__next__()
 			header = ('label',) + self.vector_names
-			# print(header)
-			out.write((','.join(header)).encode())
-			out.write(b'\n')
+
+			if (self.opts.get('store_header', True)):
+				out.write((','.join(header)).encode())
+				out.write(b'\n')
+
 			# write initial data
 			out.write(b'%s,' % label.encode())
 			np.savetxt(out, vector, delimiter=',', newline=',')

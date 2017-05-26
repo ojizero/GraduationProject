@@ -97,5 +97,5 @@ dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/Grad
 dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.dump.csv')
 
 # dataset from sara
-dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/sara', overlap=0.0, vector_maker=vector_maker)
+dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/sara', overlap=0.0, vector_maker=vector_maker, store_header=False)
 dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.dump.csv')
