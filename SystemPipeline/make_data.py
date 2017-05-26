@@ -10,6 +10,7 @@ from time import time as now
 from utils.dataset_handler import DatasetHandler
 from preprocessing.processor import Processor
 from segmentation.segmentation import Splicer
+from features.features_transformer import FeaturesTransformer
 
 def vector_maker (data, **kwargs):
 	def _slicer (splicer, data, min_len=20):
