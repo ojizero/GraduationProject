@@ -110,6 +110,8 @@ def vector_maker (data, **kwargs):
 	vector_names  = fingers_vector[0] + reference_vector[0]
 	vector_values = fingers_vector[1] + reference_vector[1]
 
+	assert all([not (np.isnan(v) or np.isinf(v)) for v in vector_values]), 'fuuucckkk'
+
 	return vector_names, vector_values
 
 dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data', overlap=0.0, vector_maker=vector_maker)

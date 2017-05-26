@@ -12,7 +12,7 @@ if __name__ == '__main__':
 	from utils.helpers import accuracy_beahviour
 	from utils.dataset_handler import DatasetHandler
 
-	dataset = DatasetHandler.from_csv_file(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.dump.corrected.csv', delimiter=',')
+	dataset = DatasetHandler.from_csv_file(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.accel.only.dump.csv', delimiter=',')
 
 	labels, data = dataset.as_arrays()
 
