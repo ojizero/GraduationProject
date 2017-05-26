@@ -82,15 +82,15 @@ def vector_maker (data, **kwargs):
 		processed_data = preprocessing_future.result()
 		active_start, active_end = segmentation_future.result()
 
-	ref_accel = np.array([data[5,active_start:active_end,2:6]])
-	ref_accel[0,:,0] = 0
+	ref_accel = np.array(data[5,active_start:active_end,2:6])
+	ref_accel[:,0] = 0
 
 	# get covariance of all readings per stream
 	processed_data = np.apply_along_axis(np.cov, 0, processed_data[:,active_start:active_end])
 
 	# all quaternion numbers from active reagion, fingers streams
 	# acceleration readings from active region, reference stream
-	active_region_data = np.array([*processed_data, *ref_accel])
+	active_region_data = np.array([processed_data, ref_accel])
 	print(data.shape, active_region_data.shape)
 
 	return FeaturesTransformer.transform(data=active_region_data, **kwargs)
