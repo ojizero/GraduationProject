@@ -12,10 +12,10 @@ if __name__ == '__main__':
 	from utils.helpers import accuracy_beahviour
 	from utils.dataset_handler import DatasetHandler
 
-	dataset = DatasetHandler.from_csv_file(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.accel.only.dump.csv', delimiter=',')
+	dataset = DatasetHandler.from_csv_file(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.accel.only.withnative.dump.csv', delimiter=',')
 
 	labels, data = dataset.as_arrays()
 
 	accuracies = [*accuracy_beahviour(data, labels, MLPClassifier, clf_ops={'hidden_layer_sizes' : (1000, 500, 250, 100)})]
 	plt.plot(accuracies)
-	plt.savefig('/Users/oji/Desktop/accel_svm.png')
+	plt.savefig('/Users/oji/Desktop/accel_neuralnet_1000_500_250_100.png')
