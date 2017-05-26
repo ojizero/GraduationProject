@@ -24,10 +24,6 @@ class FeaturesExtractor (Extractor):
 		return FeaturesExtractor._generic_loop(data, np.argmin)
 
 	@staticmethod
-	def avg (data):
-		return FeaturesExtractor._generic_loop(data, np.average)
-
-	@staticmethod
 	def arg_avg (data):
 		_func = lambda w: np.argmin(np.absolute(w - np.average(w)))
 		return FeaturesExtractor._generic_loop(data, _func)
@@ -44,7 +40,7 @@ class FeaturesExtractor (Extractor):
 		normalized_autocorrelation = FeaturesExtractor._generic_loop(autocorrelation, length_normalizer)
 		arg_max_autocorrelation    = FeaturesExtractor.arg_max(autocorrelation)
 		arg_min_autocorrelation    = FeaturesExtractor.arg_min(autocorrelation)
-		avg_autocorrelation        = FeaturesExtractor.avg(autocorrelation)
+		avg_autocorrelation        = FeaturesExtractor.mean_feature(autocorrelation)
 		arg_avg_autocorrelation    = FeaturesExtractor.arg_avg(autocorrelation)
 
 		return (
@@ -62,7 +58,7 @@ class FeaturesExtractor (Extractor):
 	def frequency_feature_set (**kwargs):
 		length_normalizer = kwargs.pop('length_normalizer', array_length_normalizer)
 		# companion feature
-		_dc_component     = lambda dft: dft[0]
+		_dc_bias          = lambda dft: sum(dft)/len(dft)
 
 		# calculate main feature
 		dft = FeaturesExtractor._generic_loop(kwargs['data_column'], np.fft.fft)
@@ -71,9 +67,9 @@ class FeaturesExtractor (Extractor):
 		normalized_dft = FeaturesExtractor._generic_loop(dft, length_normalizer)
 		arg_max_dft    = FeaturesExtractor.arg_max(dft)
 		arg_min_dft    = FeaturesExtractor.arg_min(dft)
-		avg_dft        = FeaturesExtractor.avg(dft)
+		avg_dft        = FeaturesExtractor.mean_feature(dft)
 		arg_avg_dft    = FeaturesExtractor.arg_avg(dft)
-		dc_component   = FeaturesExtractor._generic_loop(dft, _dc_component)
+		dc_bias        = FeaturesExtractor._generic_loop(dft, _dc_bias)
 
 		return (
 			( {
@@ -82,7 +78,7 @@ class FeaturesExtractor (Extractor):
 				'arg_min_dft'   : arg_min_dft[s_index,w_index],
 				'avg_dft'       : avg_dft[s_index,w_index],
 				'arg_avg_dft'   : arg_avg_dft[s_index,w_index],
-				'dc_component'  : dc_component[s_index, w_index]
+				'dc_bias'       : dc_bias[s_index, w_index]
 			} for w_index, _ in enumerate(stream) )
 				for s_index, stream in enumerate(kwargs['data_column'])
 		)

@@ -1,7 +1,7 @@
 import numpy as np
 from math import sqrt
 
-
+#move to utils
 def _euclidean_magnitude (data_point):
 	return sqrt(sum(map(lambda d: d**2, data_point)))
 
@@ -23,7 +23,7 @@ class Splicer:
 		self.accl_ratio = accl_ratio
 		self.gyro_ratio = gyro_ratio
 
-		self.smoothing_window  = tuple([0 for _ in range(smoothing_window)])
+		self.smoothing_window = tuple([0 for _ in range(smoothing_window)])
 		self.magnitude_method = magnitude_method
 
 
@@ -39,15 +39,16 @@ class Splicer:
 		accl_data = np.array(list(map(magnitude, data_array[:,3:6])))
 		return ((self.gyro_ratio * gyro_data) + (self.accl_ratio * accl_data))
 
+	# refactor me please :'(
 	# on calling this for a single record send an array of a single record
 	def smooth_intensities (self, data_array=None, averaging_window=None):
-		if data_array is None:
-			data_array = self.data_stream
-		if averaging_window is None:
-			averaging_window = self.smoothing_window
+		# if data_array is None:
+		# 	data_array = self.data_stream
+		# if averaging_window is None:
+		# 	averaging_window = self.smoothing_window
 
 		def _averager (index):
-			return np.nan_to_num(np.average(data_array[(index - averaging_window//2):(index + averaging_window//2)]))
+			return np.nan_to_num(np.average(data_array[(index - len(averaging_window)//2):(index + len(averaging_window)//2)]))
 
 		if type(averaging_window) == tuple:
 			# update smoothing window in instance
@@ -64,6 +65,9 @@ class Splicer:
 			slicer_index = -1 # return last element only
 		else:
 			slicer_index = 0  # return whole array of data
+
+		if averaging_window is None:
+			averaging_window = self.smoothing_window
 
 		return np.array(list(map(_averager, range(len(data_array))))[slicer_index:])
 
@@ -105,8 +109,9 @@ class Splicer:
 
 
 if __name__ == '__main__':
-	# data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/Proper/alef.ba.alef.ba', delimiter=',')
-	# data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
+	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/segmentation.sample.report.csv', delimiter=',')
+	# data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/6a/6a.4_29_15_22_50.csv', delimiter=',')
+	data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
 	# ### 3 ways
 	# ## 1. sum all data, perform one splicer
@@ -114,10 +119,13 @@ if __name__ == '__main__':
 	# s = Splicer(streams_sum)
 	# silence_segments = s.silence_segments()
 
-	# ## 2. sum all magnitudes, perform one splicer
-	# s = Splicer()
-	# intensities_sum = sum([s.measure_intensity(stream) for stream in data_streams])
-	# silence_segments = s.silence_segments(intensities_sum) ## use for spliting
+	## 2. sum all magnitudes, perform one splicer
+	s = Splicer()
+	intensities_sum = sum([s.measure_intensity(stream) for stream in data_streams])
+
+	intensities_smoothed = s.smooth_intensities(intensities_sum)
+
+	silence_segments = s.silence_segments(intensities_sum) ## use for spliting
 
 	# ## 3. perfrom many splicers, get intersections
 	# splicers = [Splicer(data_stream) for data_stream in data_streams]

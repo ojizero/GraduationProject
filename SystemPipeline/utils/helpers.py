@@ -13,11 +13,11 @@ def pipeline (data, *transformers):
 		data = transformer(data)
 	return data
 
-def _interpolate_nan_linear (input):
-	# print(input)
-	# exit(10)
-	while np.any(np.isnan(input)):
-		indices = np.where(np.logical_not(np.isnan(input)))
+# case if logical to have one nan at end of vector not handled
+def _interpolate_nan_linear (input_):
+	while np.any(np.isnan(input_)):
+		indices = np.where(np.logical_not(np.isnan(input_)))[0]
+
 		for ix, i in enumerate(indices):
 			if ix == 0:
 				continue
@@ -25,9 +25,10 @@ def _interpolate_nan_linear (input):
 			dif = i - indices[ix-1]
 			if dif > 1:
 				index = (i + indices[ix-1]) // 2
-				input[index] = (input[i] + input[indices[ix-1]]) / 2
+				input_[index] = (input_[i] + input_[indices[ix-1]]) / 2
+				break
 
-	return input
+	return input_
 
 def _linear_normalizer (data, constraint, discrete=True):
 	if not isinstance(data, np.ndarray):
@@ -35,11 +36,12 @@ def _linear_normalizer (data, constraint, discrete=True):
 
 	max_ = len(data)
 
-	scale_operator = lambda a, b: a * b // max_ if discrete else a * b / max_
-
 	ret = np.array([np.nan] * constraint, dtype=data.dtype)
+
+	scale_operator = lambda a: a * (constraint - 1) // (max_ - 1) if discrete else a * (constraint - 1) / (max_ - 1)
+
 	for index, value in enumerate(data):
-		ret[int(scale_operator(index, constraint))] = value
+		ret[int(scale_operator(index))] = value
 
 	return _interpolate_nan_linear(ret)
 
