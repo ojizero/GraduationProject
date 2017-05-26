@@ -2,6 +2,7 @@ import sys
 # Add project to path, to be able to import modules from it
 sys.path.append('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline')
 
+import numpy as np
 from itertools import zip_longest
 from concurrent.futures import ThreadPoolExecutor
 from time import time as now
@@ -61,10 +62,10 @@ def vector_maker (data, **kwargs):
 			return time_differential.__next__()
 
 		# data[stream][row][reading]
-		return [
-			[np.array(processor.updateIMU(*row[3:6], *row[0:3]), dt()) for row in stream]
+		return np.array([
+			[processor.updateIMU(*row[3:6], *row[0:3], dt()) for row in stream]
 				for stream, processor in zip(data, processors)
-		]
+		])
 
 	# instance responsible for segmentation
 	splicer    = Splicer(threshold=80)
@@ -80,11 +81,12 @@ def vector_maker (data, **kwargs):
 		processed_data = preprocessing_future.result()
 		active_start, active_end = segmentation_future.result()
 
-	active_region_data = np.array([
-		# all quaternion numbers from active reagion, fingers streams
-		# acceleration readings from active region, reference stream
-		*processed_data[:,active_start:active_end], data[5,active_start:active_end,3:6]
-	])
+	ref_accel = np.array([data[5,active_start:active_end,2:6]])
+	ref_accel[0,:,0] = 0
+
+	# all quaternion numbers from active reagion, fingers streams
+	# acceleration readings from active region, reference stream
+	active_region_data = np.array([*processed_data[:,active_start:active_end], *ref_accel])
 	print(data.shape, active_region_data.shape)
 
 	return FeaturesTransformer.transform(data=active_region_data, **kwargs)
