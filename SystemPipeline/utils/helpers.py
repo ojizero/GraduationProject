@@ -69,7 +69,9 @@ def _spreader (key, val):
 		else:
 			yield ('%s_%s' % (key, index), value)
 
-def flatten_key_val_vector (vector, prefix=''):
+def flatten_key_val_vector (vector, prefix='', data_handler={}):
+	_noop = lambda _ : _
+
 	for element in vector:
 		if isinstance(element, tuple):
 			key, val = element
@@ -81,12 +83,14 @@ def flatten_key_val_vector (vector, prefix=''):
 				flattened = flatten_key_val_vector(val, '%s_' % key)
 				yield from _spreader('%s%s' % (prefix, key), flattened)
 			else:
-				yield '%s%s' % (prefix, key), val
+				value = data_handler.get(val.__class__.__name__, _noop)(val)
+				yield '%s%s' % (prefix, key), value
 		else:
 			if isinstance(element, Iterable) and not isinstance(element, (str, bytes)):
 				yield from flatten_key_val_vector(element)
 			else:
-				yield '%s%s' % (prefix, key), val
+				value = data_handler.get(val.__class__.__name__, _noop)(val)
+				yield '%s%s' % (prefix, key), value
 
 def accuracy_beahviour (
 	data, labels, classifier, clf_ops={}, score_function=anova_score, epislon=0.05, ksi=0.10, rep=5, step=1
