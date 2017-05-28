@@ -29,7 +29,7 @@ class FeaturesTransformer:
 
 		transformed_dict = obj._transform(extracted_feature)
 
-		flattened_vector = flatten_key_val_vector(*transformed_dict.items())
+		flattened_vector = flatten_key_val_vector(transformed_dict.items())
 
 		features, values = zip(*flattened_vector)
 

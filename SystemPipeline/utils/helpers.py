@@ -69,26 +69,28 @@ def _spreader (key, val):
 		else:
 			yield ('%s_%s' % (key, index), value)
 
-def flatten_key_val_vector (*args):
-	for arg in args:
-		if isinstance(arg, tuple):
-			key, val = arg
+def flatten_key_val_vector (vector, prefix=''):
+	for element in vector:
+		if isinstance(element, tuple):
+			key, val = element
 			assert isinstance(key, str), 'keys must be strings'
 
 			if isinstance(val, dict):
-				yield from flatten_key_val_vector(*val.items())
+				yield from flatten_key_val_vector(val.items(), '%s_' % key)
 			elif isinstance(val, Iterable) and not isinstance(val, (str, bytes)):
-				flattened = flatten_key_val_vector(*val)
-				yield from _spreader(key, flattened)
+				flattened = flatten_key_val_vector(val, '%s_' % key)
+				yield from _spreader('%s%s' % (prefix, key), flattened)
 			else:
-				yield arg
+				yield '%s%s' % (prefix, key), val
 		else:
-			if isinstance(arg, Iterable) and not isinstance(arg, (str, bytes)):
-				yield from flatten_key_val_vector(*arg)
+			if isinstance(element, Iterable) and not isinstance(element, (str, bytes)):
+				yield from flatten_key_val_vector(element)
 			else:
-				yield arg
+				yield '%s%s' % (prefix, key), val
 
-def accuracy_beahviour (data, labels, classifier, clf_ops={}, score_function=anova_score, epislon=0, ksi=0.05, rep=10, step=1):
+def accuracy_beahviour (
+	data, labels, classifier, clf_ops={}, score_function=anova_score, epislon=0.05, ksi=0.10, rep=5, step=1
+):
 	'''
 		Generator for the behaviour of given classifier on given data, forall
 		N in range(number of features) top features
@@ -122,6 +124,6 @@ def accuracy_beahviour (data, labels, classifier, clf_ops={}, score_function=ano
 			prev_cnt += 1
 
 		if prev_cnt >= rep:
-			raise StopIteration('avoided possible segfault')
+			raise StopIteration('enough')
 
 		prev_acc = accuracy
