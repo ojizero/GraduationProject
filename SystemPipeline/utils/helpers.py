@@ -69,13 +69,14 @@ def _spreader (key, val):
 		else:
 			yield ('%s_%s' % (key, index), value)
 
-def flatten_key_val_vector (vector, prefix='', data_handler={}):
-	_noop = lambda _ : _
+_noop = lambda _ : _
 
+def flatten_key_val_vector (vector, prefix='', data_modifier=_noop):
 	for element in vector:
 		if isinstance(element, tuple):
 			key, val = element
 			assert isinstance(key, str), 'keys must be strings'
+			val = data_modifier(val)
 
 			if isinstance(val, dict):
 				yield from flatten_key_val_vector(val.items(), '%s_' % key)
@@ -83,14 +84,13 @@ def flatten_key_val_vector (vector, prefix='', data_handler={}):
 				flattened = flatten_key_val_vector(val, '%s_' % key)
 				yield from _spreader('%s%s' % (prefix, key), flattened)
 			else:
-				value = data_handler.get(val.__class__.__name__, _noop)(val)
-				yield '%s%s' % (prefix, key), value
+				yield '%s%s' % (prefix, key), val
 		else:
 			if isinstance(element, Iterable) and not isinstance(element, (str, bytes)):
 				yield from flatten_key_val_vector(element)
 			else:
-				value = data_handler.get(val.__class__.__name__, _noop)(val)
-				yield '%s%s' % (prefix, key), value
+				val = data_modifier(val)
+				yield '%s%s' % (prefix, element[0]), val
 
 def accuracy_beahviour (
 	data, labels, classifier, clf_ops={}, score_function=anova_score, epislon=0.05, ksi=0.10, rep=5, step=1
@@ -131,3 +131,12 @@ def accuracy_beahviour (
 			raise StopIteration('enough')
 
 		prev_acc = accuracy
+
+def complex_flattener (elem):
+	if isinstance(elem, (np.complex, complex)):
+		return {
+			'real': elem.real,
+			'imag': elem.imag
+		}
+	else:
+		return elem
