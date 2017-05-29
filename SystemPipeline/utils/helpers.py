@@ -89,8 +89,7 @@ def flatten_key_val_vector (vector, prefix='', data_modifier=_noop):
 			if isinstance(element, Iterable) and not isinstance(element, (str, bytes)):
 				yield from flatten_key_val_vector(element)
 			else:
-				val = data_modifier(val)
-				yield '%s%s' % (prefix, element[0]), val
+				yield data_modifier(element)
 
 def accuracy_beahviour (
 	data, labels, classifier, clf_ops={}, score_function=anova_score, epislon=0.05, ksi=0.10, rep=5, step=1

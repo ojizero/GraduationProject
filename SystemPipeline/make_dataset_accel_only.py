@@ -56,4 +56,4 @@ def vector_maker (data, **kwargs):
 	return FeaturesTransformer.transform(data=active_region_data, **kwargs)
 
 dataset = DatasetHandler.from_csv_directory(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data', overlap=0.0, vector_maker=vector_maker)
-dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/proper.dataset.accel.only.withnative.dump.csv')
+dataset.store_csv('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/floats.dataset.accel.only.withnative.dump.csv')
