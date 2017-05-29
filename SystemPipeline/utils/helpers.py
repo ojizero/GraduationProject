@@ -79,15 +79,15 @@ def flatten_key_val_vector (vector, prefix='', data_modifier=_noop):
 			val = data_modifier(val)
 
 			if isinstance(val, dict):
-				yield from flatten_key_val_vector(val.items(), '%s_' % key)
+				yield from flatten_key_val_vector(val.items(), '%s_' % key, data_modifier)
 			elif isinstance(val, Iterable) and not isinstance(val, (str, bytes)):
-				flattened = flatten_key_val_vector(val, '%s_' % key)
+				flattened = flatten_key_val_vector(val, '%s_' % key, data_modifier)
 				yield from _spreader('%s%s' % (prefix, key), flattened)
 			else:
 				yield '%s%s' % (prefix, key), val
 		else:
 			if isinstance(element, Iterable) and not isinstance(element, (str, bytes)):
-				yield from flatten_key_val_vector(element)
+				yield from flatten_key_val_vector(element, prefix, data_modifier)
 			else:
 				yield data_modifier(element)
 
@@ -138,4 +138,5 @@ def complex_flattener (elem):
 			'imag': elem.imag
 		}
 	else:
+		assert not isinstance(elem, (np.complex, complex)), 'hjhcbf'
 		return elem

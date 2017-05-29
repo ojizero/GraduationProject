@@ -52,14 +52,14 @@ if __name__ == '__main__':
 	import numpy as np
 	from collections import Iterable
 
-	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/6a/6a.4_29_15_22_50.csv', delimiter=',')
+	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/our_data/ameer/6a/6a.4_29_15_22_50.csv', delimiter=',')
 	data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
 	transformed = FeaturesTransformer.transform(data=data_streams)
 
 	# assert success
 	for v in transformed[1]:
-		assert not isinstance(v, Iterable) or isinstance(v, (str, bytes)), 'failed'
+		assert not isinstance(v, np.complex), 'failed'
 
 	with open('transformer_dump', 'w') as f:
 		f.write(str(transformed))

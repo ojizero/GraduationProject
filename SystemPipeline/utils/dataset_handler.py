@@ -86,7 +86,7 @@ class DatasetHandler:
 
 		labels = np.array([label for label, _ in dataset])
 		# make this more generic in type? np.number if possible
-		values = np.array([value for _, value in dataset], dtype=np.complex)
+		values = np.array([value for _, value in dataset])#, dtype=np.complex)
 
 		return labels, values
 
