@@ -83,8 +83,8 @@ def flatten_key_val_vector (vector, prefix='', data_modifier=_noop):
 			if isinstance(val, dict):
 				yield from flatten_key_val_vector(val.items(), '%s%s_' % (prefix, key), data_modifier)
 			elif isinstance(val, Iterable) and not isinstance(val, (str, bytes)):
-				flattened = flatten_key_val_vector(val, '%s%s_' % (prefix, key), data_modifier)
-				yield from _spreader('%s%s' % (prefix, key), flattened)
+				spread = _spreader('%s%s' % (prefix, key), val)
+				yield from flatten_key_val_vector(spread, '%s%s_' % (prefix, key), data_modifier)
 			else:
 				yield '%s%s' % (prefix, key), val
 		else:
