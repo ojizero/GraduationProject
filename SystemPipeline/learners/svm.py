@@ -16,6 +16,8 @@ if __name__ == '__main__':
 
 	labels, data = dataset.as_arrays()
 
+	data = data[:,np.any(data != data[0])] # remove constant columns
+
 	accuracies = [*accuracy_beahviour(data, labels, LinearSVC)]
 	plt.plot(accuracies)
 	plt.savefig('/Users/oji/Desktop/accel_svm.png')

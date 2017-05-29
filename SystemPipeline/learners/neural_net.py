@@ -16,6 +16,8 @@ if __name__ == '__main__':
 
 	labels, data = dataset.as_arrays()
 
+	data = data[:,np.any(data != data[0])] # remove constant columns
+
 	accuracies = [*accuracy_beahviour(data, labels, MLPClassifier, clf_ops={'hidden_layer_sizes' : (1000, 500, 250, 100)})]
 	plt.plot(accuracies)
 	plt.savefig('/Users/oji/Desktop/accel_neuralnet_1000_500_250_100.png')
