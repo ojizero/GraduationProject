@@ -65,7 +65,7 @@ def _spreader (key, val):
 		if isinstance(value, tuple) and len(value) == 2:
 			yield value
 		elif isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
-			yield from _spreader(*value)
+			yield from _spreader('%s_%s_' % (key, index), value)
 		else:
 			yield ('%s_%s' % (key, index), value)
 
@@ -75,21 +75,27 @@ def flatten_key_val_vector (vector, prefix='', data_modifier=_noop):
 	for element in vector:
 		if isinstance(element, tuple):
 			key, val = element
-			assert isinstance(key, str), 'keys must be strings'
+			assert isinstance(key, (str, bytes)), 'keys must be strings'
+
 			val = data_modifier(val)
+			assert not isinstance(val, (str, bytes)), 'values are not fucking strings @'
 
 			if isinstance(val, dict):
-				yield from flatten_key_val_vector(val.items(), '%s_' % key, data_modifier)
+				yield from flatten_key_val_vector(val.items(), '%s%s_' % (prefix, key), data_modifier)
 			elif isinstance(val, Iterable) and not isinstance(val, (str, bytes)):
-				flattened = flatten_key_val_vector(val, '%s_' % key, data_modifier)
+				flattened = flatten_key_val_vector(val, '%s%s_' % (prefix, key), data_modifier)
 				yield from _spreader('%s%s' % (prefix, key), flattened)
 			else:
 				yield '%s%s' % (prefix, key), val
 		else:
-			if isinstance(element, Iterable) and not isinstance(element, (str, bytes)):
+			element = data_modifier(element)
+
+			if isinstance(element, dict):
+				yield from flatten_key_val_vector(element.items(), prefix, data_modifier)
+			elif isinstance(element, Iterable) and not isinstance(element, (str, bytes)):
 				yield from flatten_key_val_vector(element, prefix, data_modifier)
 			else:
-				yield data_modifier(element)
+				yield element
 
 def accuracy_beahviour (
 	data, labels, classifier, clf_ops={}, score_function=anova_score, epislon=0.05, ksi=0.10, rep=5, step=1
@@ -138,5 +144,4 @@ def complex_flattener (elem):
 			'imag': elem.imag
 		}
 	else:
-		assert not isinstance(elem, (np.complex, complex)), 'hjhcbf'
 		return elem
