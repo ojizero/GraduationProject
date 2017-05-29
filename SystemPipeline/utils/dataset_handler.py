@@ -17,8 +17,8 @@ _path_label_pattern = r'^.*/(\w*)(?:\.\w+)?/.*\.csv$'
 _rgx = re.compile(_path_label_pattern)
 
 _array_regex = re.compile(r'^\[.*\]$')
-_float_regex = re.compile(r'^[+-]?\d+(?:\.\d*)?(?:e[+-]\d+)?$')
-_cmplx_regex = re.compile(r'^\(?(?:[+-]?\d+(?:\.\d*)?(?:e[+-]\d+)?[+-])?[+-]?\d+(?:\.\d*)?(?:e[+-]\d+)?j\)?$')
+_float_regex = re.compile(r'^[+-]?\d+(?:\.\d+)?(?:e[+-]\d+)?$')
+_cmplx_regex = re.compile(r'^\(?(?:[+-]?\d+(?:\.\d+)?(?:e[+-]\d+)?[+-])?[+-]?\d+(?:\.\d*)?(?:e[+-]\d+)?j\)?$')
 
 
 class DatasetHandler:
@@ -86,7 +86,7 @@ class DatasetHandler:
 
 		labels = np.array([label for label, _ in dataset])
 		# make this more generic in type? np.number if possible
-		values = np.array([value for _, value in dataset])#, dtype=np.complex)
+		values = np.array([value for _, value in dataset], dtype=np.float)
 
 		return labels, values
 
