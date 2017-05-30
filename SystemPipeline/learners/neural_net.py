@@ -33,7 +33,7 @@ if __name__ == '__main__':
 	# plt.plot(accuracies)
 	# plt.savefig('/Users/oji/Desktop/accel_neuralnet_1000_500_250_100.png')
 
-	clf = MLPClassifier(hidden_layer_sizes=(1000, 500, 250, 100))
+	clf = MLPClassifier(hidden_layer_sizes=(200, 800, 28))
 	clf.fit(training_data, training_labels)
 
 	print('accuracy', clf.score(testing_data, testing_labels))

@@ -109,9 +109,9 @@ class Splicer:
 
 
 if __name__ == '__main__':
-	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/segmentation.sample.report.csv', delimiter=',')
+	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/sara_name/sara_name.5_30_11_44_54.csv', delimiter=',')
 	# data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/6a/6a.4_29_15_22_50.csv', delimiter=',')
-	data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
+	# data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
 
 	# ### 3 ways
 	# ## 1. sum all data, perform one splicer
@@ -120,12 +120,12 @@ if __name__ == '__main__':
 	# silence_segments = s.silence_segments()
 
 	## 2. sum all magnitudes, perform one splicer
-	s = Splicer()
-	intensities_sum = sum([s.measure_intensity(stream) for stream in data_streams])
+	# s = Splicer()
+	# intensities_sum = sum([s.measure_intensity(stream) for stream in data_streams])
 
-	intensities_smoothed = s.smooth_intensities(intensities_sum)
+	# intensities_smoothed = s.smooth_intensities(intensities_sum)
 
-	silence_segments = s.silence_segments(intensities_sum) ## use for spliting
+	# silence_segments = s.silence_segments(intensities_sum) ## use for spliting
 
 	# ## 3. perfrom many splicers, get intersections
 	# splicers = [Splicer(data_stream) for data_stream in data_streams]

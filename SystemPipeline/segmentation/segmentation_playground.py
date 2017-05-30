@@ -65,7 +65,7 @@ gyro = smooth_intensities(intensity_calculator(data, accl_ratio=0), 50)
 silence = silence_segments(gyro)
 
 plt.plot(gyro)
-[plt.axvline(x=i, color='k', linestyle="--") for t in silence for i in t]
+[plt.axvline(x=i, color='k', linestyle="--") for t in silence_segments for i in t]
 
 
 both_smooth_10 = smooth_intensities(both, 10)
