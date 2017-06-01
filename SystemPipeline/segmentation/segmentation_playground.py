@@ -59,7 +59,7 @@ def splice_data (data, silence_segments):
 	return [data[start:end,:] for start, end in segments]
 
 
-data = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/Proper/alef.ba.alef.ba', delimiter=',')
+data = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/sara_name/sara_name.5_30_11_44_54.csv', delimiter=',')
 both = intensity_calculator(data)
 gyro = smooth_intensities(intensity_calculator(data, accl_ratio=0), 50)
 silence = silence_segments(gyro)

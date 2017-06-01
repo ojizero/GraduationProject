@@ -14,8 +14,8 @@ class FeaturesTransformer:
 	_extractor     = FeaturesExtractor
 	_windows_count = 5 # number of windows, -1 for letting extractor decide
 
-	def __init__ (self, *args, **kwargs):
-		self._extractor = kwargs.pop('extractor', FeaturesTransformer._extractor)
+	def __init__ (self, extractor):
+		self._extractor = extractor if extractor is not None else FeaturesTransformer._extractor
 
 	@classinstancemethod
 	def transform (obj, **kwargs):

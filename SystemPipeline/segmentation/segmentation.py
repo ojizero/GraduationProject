@@ -111,7 +111,7 @@ class Splicer:
 if __name__ == '__main__':
 	data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/sara_name/sara_name.5_30_11_44_54.csv', delimiter=',')
 	# data_whole = np.genfromtxt('/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/data/ameer/6a/6a.4_29_15_22_50.csv', delimiter=',')
-	# data_streams = np.array([data_whole[:,r:r+6] for r in range(0, 54, 9)])
+	# data_streams = np.array([data_whole[:,r+3:r+6] for r in range(0, 54, 9)])
 
 	# ### 3 ways
 	# ## 1. sum all data, perform one splicer
