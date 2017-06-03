@@ -16,6 +16,10 @@ class StructureTransformer (FeaturesTransformer):
 		names, values = super().transform(**kwargs)
 		names, values = np.array(names), np.array(values)
 
+		return obj.restructure(names, values, **kwargs)
+
+	@classinstancemethod
+	def restructure (obj, names, values, **kwargs):
 		windows_count = kwargs.get('windows_count', obj._windows_count)
 		streams_count = kwargs.get('streams_count', 6)
 

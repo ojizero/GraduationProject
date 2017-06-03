@@ -57,7 +57,7 @@ class DatasetHandler:
 		input_generator = cls._input_generator(path)
 
 		vector_names = tuple(col.strip() for col in input_generator.__next__().decode().split(delimiter)[1:])
-		vector_maker = lambda row: (row[0], vector_names, row[1:])
+		vector_maker = kwargs.pop('vector_maker', lambda row: (row[0], vector_names, row[1:]))
 
 		def _dataset_generator ():
 			for row in input_generator:
