@@ -67,50 +67,115 @@ def cnn_model (features, labels, mode):
 	)
 
 	# Second convolution layer
-	# Computes 64 features using a 5x5 filter.
+	# Computes 48 features using a 5x5 filter.
 	# Padding is added to preserve width and height.
 	# Input Tensor Shape: [batch_size, 28, 29, 32]
-	# Output Tensor Shape: [batch_size, 28, 29, 64]
+	# Output Tensor Shape: [batch_size, 28, 29, 48]
 	conv_layer_2 = tf.layers.conv2d(
 		inputs=pool_layer_1,
-		filters=64,
+		filters=48,
 		kernel_size=[5, 5],
 		padding='same',
 		activation=tf.nn.relu
 	)
 
 	# Second pooling layer
-	# Pooling Layer #2
-	# Input Tensor Shape: [batch_size, 28, 29, 64]
-	# Output Tensor Shape: [batch_size, 14, 14, 64]
+	# Input Tensor Shape: [batch_size, 28, 29, 48]
+	# Output Tensor Shape: [batch_size, 9, 9, 48]
 	pool_layer_2 = tf.layers.max_pooling2d(
 		inputs=conv_layer_2,
-		pool_size=[2, 2],
-		strides=2
+		pool_size=[3, 3],
+		strides=3
 	)
 
-	# Flatten second pooling layer
+	# Third convolution layer
+	# Computes 64 features using a 5x5 filter.
+	# Padding is added to preserve width and height.
+	# Input Tensor Shape: [batch_size, 9, 9, 48]
+	# Output Tensor Shape: [batch_size, 9, 9, 64]
+	conv_layer_3 = tf.layers.conv2d(
+		inputs=pool_layer_2,
+		filters=64,
+		kernel_size=[5, 5],
+		padding='same',
+		activation=tf.nn.relu
+	)
+
+	# Third pooling layer
+	# Output Tensor Shape: [batch_size, 9, 9, 64]
+	# Output Tensor Shape: [batch_size, 3, 3, 64]
+	pool_layer_3 = tf.layers.max_pooling2d(
+		inputs=conv_layer_3,
+		pool_size=[3, 3],
+		strides=3
+	)
+
+	# Flatten third pooling layer
+	flattened_pool = tf.reshape(pool_layer_3, [-1, 3 * 3 * 64])
 
 	# First fully connected layer
+	# Densely connected layer with 400 neurons
+	# Input Tensor Shape: [batch_size, 3 * 3 * 64]
+	# Output Tensor Shape: [batch_size, 400]
+	connected_layer_1 = tf.layers.dense(
+		inputs=flattened_pool,
+		units=400,
+		activation=tf.nn.relu
+	)
+
+	# Dropout
+	# Add dropout operation; 0.6 probability that element will be kept
+	dropout_1 = tf.layers.dropout(
+		inputs=connected_layer_1,
+		rate=0.4,
+		training=True
+	)
 
 	# Second fully connected layer
+	# Densely connected layer with 200 neurons
+	# Input Tensor Shape: [batch_size, 400]
+	# Output Tensor Shape: [batch_size, 200]
+	connected_layer_2 = tf.layers.dense(
+		inputs=dropout_1,
+		units=200,
+		activation=tf.nn.relu
+	)
+
+	# Dropout
+	# Add dropout operation; 0.67 probability that element will be kept
+	dropout_2 = tf.layers.dropout(
+		inputs=connected_layer_2,
+		rate=0.3,
+		training=True
+	)
 
 	# Output layer
+	logits = tf.layers.dense(
+		inputs=dropout_2,
+		units=len(np.unique(labels)),
+		activation=tf.nn.relu
+	)
 
-	print('input', input_layer.shape)
-	print('conv_1', conv_layer_1.shape)
-	print('pool_1', pool_layer_1.shape)
-	print('conv_2', conv_layer_2.shape)
-	print('pool_2', pool_layer_2.shape)
+	print('input'    , input_layer.shape)
+	print('conv_1'   , conv_layer_1.shape)
+	print('pool_1'   , pool_layer_1.shape)
+	print('conv_2'   , conv_layer_2.shape)
+	print('pool_2'   , pool_layer_2.shape)
+	print('conv_3'   , conv_layer_3.shape)
+	print('pool_3'   , pool_layer_3.shape)
+	print('flat_pool', flattened_pool.shape)
+	print('fully_1'  , connected_layer_1.shape)
+	print('drop_1'   , dropout_1.shape)
+	print('fully_2'  , connected_layer_2.shape)
+	print('drop_2'   , dropout_2.shape)
+	print('logits'   , logits.shape)
 
-	exit(10)
-
-
-path = '/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/floats.dataset.accel.only.withnative.dump.csv' # get file name
+# get file name
+path = '/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/floats.dataset.accel.only.withnative.dump.csv'
 
 dataset = DatasetHandler.from_csv_file(path, vector_maker=vector_maker, dtype=np.float32)
 
 labels, features = dataset.as_arrays()
 
 
-cnn_model(features, 0, 0)
+cnn_model(features, labels, 0)
