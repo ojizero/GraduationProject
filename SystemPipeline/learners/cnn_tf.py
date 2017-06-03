@@ -47,8 +47,26 @@ def cnn_model (features, labels, mode):
 	input_layer = tf.reshape(features, [-1, width, height, 1])
 
 	# First convolution layer
+	# Computes 32 features using a 5x5 filter with ReLU activation.
+	# Padding is added to preserve width and height.
+	# Input Tensor Shape: [batch_size, 147, 30, 1]
+	# Output Tensor Shape: [batch_size, 147, 30, 32]
+	conv_layer_1 = tf.layers.conv2d(
+		inputs=input_layer,
+		filters=32,
+		kernel_size=[5, 5],
+		padding='same', # how to make this wrap around ?!
+		activation=tf.nn.relu
+	)
 
 	# First pooling layer
+	# Input Tensor Shape: [batch_size, 147, 30, 32]
+	# Output Tensor Shape: [batch_size, 30, 13, 32]
+	pool_layer_1 = tf.layers.max_pooling2d(
+		inputs=conv_layer_1,
+		pool_size=[8, 2],
+		strides=[5, 1] # stride assures overlapping between filters
+	)
 
 	# Second convolution layer
 
