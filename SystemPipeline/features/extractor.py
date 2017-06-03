@@ -10,12 +10,68 @@ from utils.decorators import classinstancemethod
 
 
 class Extractor:
+	'''
+
+	Main class responsible for extracting features from data.
+	Sub-classes are responsible for defining said features
+	and how they interpolate input data.
+
+	'''
 	_EXTRACT_ON  = lambda string: match('.*_feature$', string)
 	_WINDOW_SIZE = 10
 	_TRANSFORMER = lambda _: _
 
 	@classinstancemethod
 	def extract (obj, **kwargs):
+		'''
+		Extracts any number of feature from input data.
+		This method can be called from an instance,
+		or directly from the class, the method's
+		behaviour is the same and the only
+		difference is the internal behaviour
+		for features.
+
+		Keyworded Arguments:
+			data        (array-like|required) :
+				The input data, preferably NumPy array, currently
+				it has to be shaped as (Streams, Samples, Readings),
+				if (Samples, Readings) multi option must be set to False.
+				- First dimension is the data stream
+				- Second dimension is the samples
+				- Third dimension is the sample readings.
+
+			multi       (boolean|optional)   :
+				Describes whether the data is 3D (True) or 2D (False)
+				Defaults to True
+
+			window_size (int|optional)       :
+				Controls how many windows the streams will be split on,
+				feature functions are applied at the window level.
+				Defaults to the class _WINDOW_SIZE parameter,
+				Base class default 10
+
+			overlap     (float|optional)     :
+				A number between greater than 0 and less than 1,
+				describes the overlapping percentage betweent
+				the windows.
+				Defaults to 0
+
+			extract_on  ((str) -> boolean|optional) :
+				A function that decides (based on a function's name)
+				whether or not it is a feature function.
+				Base class default lambda string: match('.*_feature$', string)
+
+			**kwargs    (dict|optional)      : Any additional passed kwargs are passed to internal functions
+
+		Returns:
+			NumPy Array :
+				An array, with the first index representing to the column or readings index,
+				which points to a dictionary mapping each feature's name to an array
+				which is indexed by the stream index, then the window index, containing
+				the feature output for that window.
+
+				[column/reading]['feature_name'][sensor][window]
+		'''
 		assert kwargs.get('data', []) != [], '`data` is a required parameter'
 		data = kwargs.pop('data')
 
@@ -45,6 +101,10 @@ class Extractor:
 
 	@classinstancemethod
 	def _extract (obj, data_column, **kwargs):
+		'''
+		Performs actual extraction, uses introspection to get all methods
+		of the calling object, using the extrac_on method as a filter.
+		'''
 		extract_on = kwargs.get('extract_on', obj._EXTRACT_ON)
 
 		if isinstance(obj, type):

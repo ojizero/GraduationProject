@@ -25,4 +25,4 @@ class StructureTransformer (FeaturesTransformer):
 		names  = np.array([names[pivot:pivot+step]  for pivot in range(0, end, step)])
 		values = np.array([values[pivot:pivot+step] for pivot in range(0, end, step)])
 
-		return names, values, values.shape
+		return names, values
