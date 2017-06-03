@@ -12,5 +12,7 @@ import tensorflow as tf
 # # two paths for restructuring while preserving correlations
 # # # -> height, width = streams, features per stream
 # # # -> height, width = streams*windows, features per window
+from features.structure_transformer import StructureTransformer
 
 # no need for feature selection here, let and let be
+
