@@ -35,7 +35,7 @@ def vector_maker (row, names):
 
 def cnn_model (features, labels, mode):
 	height, width = features[0].shape
-	print('h', height, 'w', width)
+	output_size = len(np.unique(labels))
 
 	# Input layer of CNN
 	# shape is 4D -> [batch_size, image_width, image_height, channels]
@@ -128,7 +128,7 @@ def cnn_model (features, labels, mode):
 	dropout_1 = tf.layers.dropout(
 		inputs=connected_layer_1,
 		rate=0.4,
-		training=True
+		training=mode == learn.ModeKeys.TRAIN
 	)
 
 	# Second fully connected layer
@@ -146,16 +146,18 @@ def cnn_model (features, labels, mode):
 	dropout_2 = tf.layers.dropout(
 		inputs=connected_layer_2,
 		rate=0.3,
-		training=True
+		training=mode == learn.ModeKeys.TRAIN
 	)
 
 	# Output layer
 	logits = tf.layers.dense(
 		inputs=dropout_2,
-		units=len(np.unique(labels)),
+		units=output_size,
 		activation=tf.nn.relu
 	)
 
+	## Print shapes of layers
+	print('h', height, 'w', width)
 	print('input'    , input_layer.shape)
 	print('conv_1'   , conv_layer_1.shape)
 	print('pool_1'   , pool_layer_1.shape)
@@ -170,6 +172,43 @@ def cnn_model (features, labels, mode):
 	print('drop_2'   , dropout_2.shape)
 	print('logits'   , logits.shape)
 
+	loss = None
+	train_op = None
+
+	# Calculate loss for both TRAIN and EVAL modes
+	# measures how closely the model's predictions match the target classes
+	if mode != tf.contrib.learn.ModeKeys.INFER:
+		onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=output_size)
+		loss = tf.losses.softmax_cross_entropy(
+			onehot_labels=onehot_labels,
+			logits=logits
+		)
+
+	# Configure the Training Op (for TRAIN mode)
+	if mode == learn.ModeKeys.TRAIN:
+		train_op = tf.contrib.layers.optimize_loss(
+			loss=loss,
+			global_step=tf.contrib.framework.get_global_step(),
+			learning_rate=0.001,
+			optimizer='SGD'
+		)
+
+	# Generate Predictions
+	predictions = {
+		"classes": tf.argmax(input=logits, axis=1),
+		"probabilities": tf.nn.softmax(logits, name="softmax_tensor")
+	}
+
+	# Return a ModelFnOps object
+	return model_fn_lib.ModelFnOps(
+		mode=mode,
+		predictions=predictions,
+		loss=loss,
+		train_op=train_op
+	)
+
+
+
 # get file name
 path = '/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/floats.dataset.accel.only.withnative.dump.csv'
 
@@ -177,5 +216,10 @@ dataset = DatasetHandler.from_csv_file(path, vector_maker=vector_maker, dtype=np
 
 labels, features = dataset.as_arrays()
 
+# convert labels to be indices
+# because fuck tensorflow :|
+uniques = np.unique(labels)
+for index, unique in enumerate(uniques):
+	labels[labels == unique] = index
 
 cnn_model(features, labels, 0)
