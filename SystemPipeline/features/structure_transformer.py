@@ -23,10 +23,10 @@ class StructureTransformer (FeaturesTransformer):
 		windows_count = kwargs.get('windows_count', obj._windows_count)
 		streams_count = kwargs.get('streams_count', 6)
 
-		step = len(names) // streams_count // windows_count
-		end  = len(names)
+		width  = len(names) // streams_count // windows_count
+		height = streams_count * windows_count
 
-		names  = np.array([names[pivot:pivot+step]  for pivot in range(0, end, step)])
-		values = np.array([values[pivot:pivot+step] for pivot in range(0, end, step)])
+		names  = np.reshape(names,  (width, height))
+		values = np.reshape(values, (width, height))
 
 		return names, values

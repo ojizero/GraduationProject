@@ -34,7 +34,7 @@ def vector_maker (row):
 	names = [str(i) for i in range(len(row))]
 
 	# kwargs of restructure method adjusted to our specific use case
-	return (label,) + StructureTransformer.restructure(name, row[1:], windows_count=5, streams_count=6)
+	return (label,) + StructureTransformer.restructure(names, row[1:], windows_count=5, streams_count=6)
 
 path = '' # get file name
 
