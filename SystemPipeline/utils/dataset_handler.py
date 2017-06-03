@@ -57,13 +57,14 @@ class DatasetHandler:
 		input_generator = cls._input_generator(path)
 
 		vector_names = tuple(col.strip() for col in input_generator.__next__().decode().split(delimiter)[1:])
-		vector_maker = kwargs.pop('vector_maker', lambda row: (row[0], vector_names, row[1:]))
+		vector_maker = kwargs.pop('vector_maker', lambda row, names: (row[0], names, row[1:]))
 
 		def _dataset_generator ():
 			for row in input_generator:
-				yield vector_maker(cls._convert_str(row, delimiter))
+				# THIS IS A BREAKING CHANGE !!!!
+				yield vector_maker(cls._convert_str(row, delimiter), vector_names)
 
-		return cls(dataset_iterator=_dataset_generator(), vector_names=vector_names, **kwargs)
+		return cls(dataset_iterator=_dataset_generator(), **kwargs) # , vector_names=vector_names
 
 	def __iter__ (self):
 		return self
@@ -85,8 +86,7 @@ class DatasetHandler:
 		dataset = [*self]
 
 		labels = np.array([label for label, _ in dataset])
-		# make this more generic in type? np.number if possible
-		values = np.array([value for _, value in dataset], dtype=np.float)
+		values = np.array([value for _, value in dataset], dtype=self.opts.get('dtype', np.float))
 
 		return labels, values
 
