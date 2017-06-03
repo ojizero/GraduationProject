@@ -36,6 +36,30 @@ def vector_maker (row):
 	# kwargs of restructure method adjusted to our specific use case
 	return (label,) + StructureTransformer.restructure(names, row[1:], windows_count=5, streams_count=6)
 
+def cnn_model (features, labels, mode):
+	width, height = features[0].shape
+
+	# Input layer of CNN
+	# shape is 4D -> [batch_size, image_width, image_height, channels]
+	# # batch_size number of elements in features array
+	# # channels number of colour channels in features (as images)
+	# # width and height are already done in our case by the StructureTransformer
+	input_layer = tf.reshape(features, [-1, width, height, 1])
+
+	# First convolution layer
+
+	# First pooling layer
+
+	# Second convolution layer
+
+	# Second pooling layer
+
+	# First fully connected layer
+
+	# Second fully connected layer
+
+	# Output layer
+
 path = '' # get file name
 
 dataset = DatasetHandler.from_csv_file(path, vector_maker=vector_maker)
