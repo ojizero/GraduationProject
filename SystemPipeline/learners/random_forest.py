@@ -7,6 +7,7 @@ if __name__ == '__main__':
 	import numpy as np
 	from sklearn.ensemble import RandomForestClassifier
 	from sklearn.model_selection import cross_val_score
+	from sklearn.feature_selection import SelectKBest, f_classif as anova_score
 
 	from utils.dataset_handler import DatasetHandler
 
@@ -15,6 +16,10 @@ if __name__ == '__main__':
 	# retrieve labels and data
 	# from the dataset generator
 	labels, data = dataset.as_arrays()
+
+	# select top 100 features
+	selector = SelectKBest(anova_score, 500)
+	data = selector.fit_transform(data, labels)
 
 	# classifier object
 	random_forest_clf = RandomForestClassifier()
