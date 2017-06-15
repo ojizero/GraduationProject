@@ -83,10 +83,14 @@ class DatasetHandler:
 
 	# think a better implementation ?
 	def as_arrays (self):
+		_rm_nan = lambda _ : np.nan_to_num(_)
+
 		dataset = [*self]
 
 		labels = np.array([label for label, _ in dataset])
 		values = np.array([value for _, value in dataset], dtype=self.opts.get('dtype', np.float))
+
+		values = _rm_nan(values) if self.opts.get('nan_to_num', False) else values
 
 		return labels, values
 

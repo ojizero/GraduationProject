@@ -10,8 +10,10 @@ if __name__ == '__main__':
 
 	from utils.dataset_handler import DatasetHandler
 
-	dataset = DatasetHandler.from_csv_file(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/floats.dataset.accel.only.withnative.dump.csv', delimiter=',')
-
+	# read data file
+	dataset = DatasetHandler.from_csv_file(path='/Users/oji/Workspace/Self/GraduationProject/SystemPipeline/floats.dataset.accel.only.withnative.dump.csv', delimiter=',', dtype=np.float32, nan_to_num=True)
+	# retrieve labels and data
+	# from the dataset generator
 	labels, data = dataset.as_arrays()
 
 	# classifier object
@@ -23,4 +25,6 @@ if __name__ == '__main__':
 	# get average accuracy and range of error
 	avg_acc, std_acc = scores.mean(), scores.std() * 2
 
-	print('%s[±%s]' % (avg_acc, std_acc))
+	# print the mean score and the 95% confidence
+	# interval of the score estimate
+	print('%s (±%s)' % (avg_acc, std_acc))
