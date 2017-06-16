@@ -89,8 +89,7 @@ class Extractor:
 		## method logic parameters
 		begin = border = window_size // 2
 		step  = window_size - round(overlap * window_size)
-		# maybe set this to step size // 2 instead of window size ?
-		end   = data.shape[1] - window_size // 2 + 1
+		end   = data.shape[1] - step // 2 + 1
 
 		# window the data
 		data_windowed = np.array([data[:,pivot-border:pivot+border,...] for pivot in range(begin, end, step)])
